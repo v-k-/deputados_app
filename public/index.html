@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- lodash -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <p class="topHeaderText">depu<span class="differentSize">d</span>ados abertos</p>
+    </div>
+    <div class="topnav">
+        <a href="#" data-value="siglaPartido">partidos</a>
+        <a href="#" data-value="siglaUf">estados</a>
+        <a href="#" data-value="nome">nomes</a>
+    </div>
+    <div id="p5">
+        <script type='module' src="entry.mjs"></script>
+    </div>
+    <div class="footer">
+        <span id='ultima'>loading data...</span>
+    </div>
+</body>
+</html>
