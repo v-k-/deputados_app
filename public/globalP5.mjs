@@ -74,7 +74,7 @@ let sorter = 'siglaPartido';
 let navLinks;
 let cnv;
 let resizeTimeout;
-let scroll = 0.0;
+let scrollOff = 0.0;
 
 function preload() {
     cnvHeight = calcCnvHeight();
@@ -104,68 +104,42 @@ function setup() {
 
     const c = 10; // floor(random(1, 10));
     const r = 5; // floor(random(1, 6));
-    grid = new Grid(0, 0, windowWidth, cnvHeight, 30, 30, 1, 1, 0, 0);
-    grid.setPanelLimits(190, 220);
-    grid.setPanelNumber(deputados.length)
-    console.log(`grid =`);
-    console.log(grid);
-    panels = grid.panels;
-    console.log(panels);
-    const point = grid.makeGpoint(width / 2, height / 2);
-    grid.doodle(true);
     imageMode(CENTER)
-    background(140, 130, 40);
-    deputados[13].showImage(100, 50);
-    deputados[13].showBadge(100, 50);
+    // background(140, 130, 40);
+    // deputados[13].showImage(100, 50);
+    // deputados[13].showBadge(100, 50);
+    console.log(deputados[13])
 }; // === === === --- -> eof setup
 
 
 // draw
 function draw() {
-    background(140);
-    grid.doodle();
-    // console.log(panels);
-
-    //     const panels = grid.panels;
-    // for (var i = 0; i < panels.length; i++) {
-    //     fill(i*8, 30,100);
-    //     const p = createVector(panels[i].center.x, panels[i].center.y);
-    //     rect(panels[i].p0.x , panels[i].p0.y, panels[i].panelSize.x, panels[i].panelSize.y )
-    //     fill(255,30)
-    //     ellipse(p.x, p.y +, 50, 50);
-    //     fill(20)
-    //     textSize(50);
-    //     text(i.toString(),p.x-20, p.y+25 );
-    // }
-
-
+    clear(140);
+    // orbitControl(); 
+    const x = 200;
+    const y = 200;
+    textSize(40);
     for (var i = 0; i < deputados.length; i++) {
-        const dep = deputados[i];
-        const panel = grid.panels[i]
-        const x = grid.panels[i].center.x;
-        const y = grid.panels[i].center.y;
-        if (true) {
-            deputados[i].showBadge(x, y)
-        }
+        const   dep = deputados[i];
+        const x = dep.badgeWidth*0.7;
+        const y = scrollOff + (dep.badgeWidth*1.6) * i
+        dep.showImage(x , y)
+        text(dep.nome, x + 30 + dep.badgeWidth/2 , y - 160 )
+        text(dep.siglaPartido, x + 30 + dep.badgeWidth/2 , y - 100 )
+        text(dep.municipioNascimento +" - "+ dep.siglaUf, x + 30 + dep.badgeWidth/2 , y - 40 )
+        const t  = dep.escolaridade ? dep.escolaridade : "sem dados";
+        text("escolaridade: "+ t, x + 30 + dep.badgeWidth/2 , y + 20 )
+        // console.log(dep);
+
+
     }
-    noLoop();
-    // ellipse(grid.panels[23].center.x, grid.panels[23].center.y, 30,30)
-    // ellipse(grid.p3.x, grid.p3.y, 30, 30)
-    // ellipse(grid.center.x, grid.center.y, 30,30)
-    // console.log('=== === >', deputados.length)
-    // console.log(deputados[13])
-    // // image(deputados[13].image, 120,110)
-    // displaySorted(sorter);
-    // noLoop();
 }; // === === === --- -> eof draw
 
 
 function windowResized() {
     clearTimeout(resizeTimeout); // Clear previous timeout if any
     resizeTimeout = setTimeout(resetCnv, 400); // Set a new timeout
-    grid.update();
-    for (const panel of panels) {}
-        redraw();
+    redraw();
 };
 
 
@@ -176,10 +150,8 @@ function keyPressed() {
 
 
 function trackScroll() {
-    scroll += event.deltaY;
-    grid.setOffset(0, scroll);
-    // grid.update();
-    redraw()
+    scrollOff += event.deltaY;
+    // redraw()
 }
 
 //   EOF P5 default functions

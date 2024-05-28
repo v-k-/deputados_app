@@ -1,3 +1,13 @@
+        // ++ ++ ++ NOTES:
+        //////
+        // - erro pra qd nao vem detalhes nao ficar tentendo pra sempre
+        // - outros erros   pra não bloquear
+
+
+
+
+
+
         //****************************************
         //----Strict
         "use strict";
@@ -26,10 +36,13 @@
         const fileName = `lastestData.json`;
         let lastUpdateDate = new Date(); // Default value for lastUpdateDate
         const normalizedImageHeight = 470;
-        const __dirname = path.dirname(new URL(
-            import.meta.url).pathname);
+        const __dirname = path.dirname(new URL(import.meta.url).pathname);
         const placeholderImage = path.join(__dirname, 'public', 'images', 'fotoPlaceHolder.jpg');
         const interval = 2 * 60 * 60 * 1000; // 2hs em milliseconds;
+
+        //generic image 
+        const missingPhotoPath = path.join(__dirname, 'public', 'images', 'missingPhoto.jpg');
+        let missingPhotoBase64;
 
         //error and tests 
         let testMode = true; // Test mode flag
@@ -54,6 +67,8 @@
                     "siglaUf": dep.siglaUf || null,
                     "dataNascimento": dep.details.dataNascimento || null,
                     "imageB64": dep.imageB64 || null,
+                    "municipioNascimento": dep.details.municipioNascimento || null,
+                    "escolaridade": dep.details.escolaridade || null, 
                 }));
                 res.json({
                     "deputados": initialData,
@@ -75,6 +90,14 @@
         app.use('/ourModules', express.static(path.join(__dirname, 'modules')));
 
 
+        
+        const missingPhotoBuffer = fs.readFileSync(missingPhotoPath);
+        missingPhotoBase64 = missingPhotoBuffer.toString('base64');
+        console.log("missingPhoto loaded");
+
+
+
+
 
         //****************************************
         //____Server's data handling 
@@ -84,13 +107,14 @@
             // This should be a complete Deputado with: 
             // Details, UltimoEstado and gabinete e b64 image 
             // Except for the very first time of the specific code 
-            console.log(`==          -           ==`);
-            console.log(`_                        _`);
-            console.log(`_                        _`);
-            console.log(`                         _`);
-            console.log(`|O _ O| Lets get some data`);
-            console.log(`                        ==`);
-            console.log(`==          -           ==`);
+            console.log(`==               -                 ==`);
+            console.log(`_                                   _`);
+            console.log(`_                                   _`);
+            console.log(`_                                   _`);
+            console.log(`_             |O _ O|               _`);
+            console.log(`_        Lets get some data         _`);
+            console.log(`_                                  ==`);
+            console.log(`==               -                 ==`);
             try {
                 // Load data from files
                 const thereIsData = fs.existsSync(fileName);
@@ -212,61 +236,102 @@
         }
 
 
-        async function getDetails(deputados) {
-            for (const deputado of deputados) {
-                try {
-                    const url = `${apiDeputados}/${deputado.id}`;
-                    const response = await axios.get(url);
-                    const d = response.data.dados;
-                    deputado.setDetails(d);
-                } catch (error) {
-                    console.error("Error populating details for deputado:");
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
+async function getDetails(deputados) {
+    for (const deputado of deputados) {
+        try {
+            let url;
+            if (deputado.id) {
+                url = `${apiDeputados}/${deputado.id}`;
+            } else {
+                console.error(`Deputado ${deputado.nome || 'unknown'} has neither ID nor name.`);
+                continue;
+            }
+
+            const response = await axios.get(url);
+            let d;
+
+            if (deputado.id) {
+                d = response.data.dados;
+            } else {
+                const fetchedDeputado = response.data.dados.find(dep => dep.nome === deputado.nome);
+                if (fetchedDeputado) {
+                    deputado.id = fetchedDeputado.id;
+                    url = `${apiDeputados}/${deputado.id}`;
+                    const detailsResponse = await axios.get(url);
+                    d = detailsResponse.data.dados;
+                } else {
+                    console.error(`Deputado ${deputado.nome} details could not be found.`);
+                    continue;
                 }
             }
 
-        }
-
-
-
-        async function getImages(deputados) {
-
-            // Attempt fetching images for all deputados
-            for (const deputado of deputados) {
-                let url = deputado.urlFoto;
-                if (deputado.id === '220593' && throwFetchError)  url = deputado.urlFoto + "numfa"; 
-                throwFetchError = false;
-                await axios.get(url, {
-                        responseType: 'arraybuffer'
-                    })
-                    .then(response => {
-                        const base64Image = Buffer.from(response.data, 'binary').toString('base64');
-                        deputado.setB64Image(base64Image);
-                    })
-                    .catch(error => {
-                        if (error.response) {
-                            // The request was made and the server responded with a status code
-                            // that falls out of the range of 2xx
-                            // console.log(error.response.data);
-                            console.log(`Error fetching image of ${deputado.id}`)
-                            console.log(error.response.status);
-                            console.log(error.response.headers);
-                            console.log(error.response.statusText);
-                            console.log(error.response.config);
-                        } else if (error.request) {
-                            // The request was made but no response was received
-                            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                            // http.ClientRequest in node.js
-                            console.log(error.request);
-                        } else {
-                            // Something happened in setting up the request that triggered an Error
-                            console.log('Error', error. smessage);
-                        }
-                    });
+            deputado.setDetails(d);
+        } catch (error) {
+            console.error(`Error populating details for deputado ${deputado.nome || deputado.id}:`);
+            if (error.response) {
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
             }
         }
+    }
+}
+
+
+
+
+async function getImages(deputados) {
+    // Attempt fetching images for all deputados
+    for (const deputado of deputados) {
+        // Check if imageUrl is null
+        if (!deputado.urlFoto) {
+            console.log(`Image URL not available for ${deputado.nome}`);
+            deputado.setB64Image(missingPhotoBase64);
+            continue; // Skip to the next deputado
+        }
+        
+        let url = deputado.urlFoto;
+        if (deputado.id === '220593' && throwFetchError) url = deputado.urlFoto + "numfa";
+        throwFetchError = false;
+
+        try {
+            // Fetch the image as array buffer
+            const response = await axios.get(url, {
+                responseType: 'arraybuffer'
+            });
+
+            // Convert response data to Base64
+            const base64Image = Buffer.from(response.data, 'binary').toString('base64');
+
+            // Await the setB64Image method to resize and set the image
+            await deputado.setB64Image(base64Image);
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                deputado.setB64Image(missingPhotoBase64);
+                console.log(`Error fetching image of ${deputado.id}`);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+                //  console.log(error.response.statusText);
+                // console.log(error.response.config);
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+            }
+        }
+    }
+}
+
 
         async function retriever() {
             console.log(`|o _ o| will look for missing images or details...`);
@@ -308,6 +373,7 @@
             }));
             console.log(`\ndados salvos \n`)
         }
+
 
 
 

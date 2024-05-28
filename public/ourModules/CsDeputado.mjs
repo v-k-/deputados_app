@@ -12,7 +12,14 @@ export default class CsDeputado {
                 // Load the image
                 this.makeP5Image();
                 this.dataNascimento = obj.dataNascimento;
+                this.municipioNascimento =  obj.municipioNascimento
+                this.escolaridade =  obj.escolaridade
+
+
+
                 this.badgeWidth = 357;
+
+
             }
 
             makeP5Image() {
@@ -42,7 +49,7 @@ export default class CsDeputado {
 
                 push();
                 translate(x, y);
-                scale(0.091);
+                scale(0.4);
                 try {
                     const colorsValue = colors[this.siglaPartido]; // Get the RGB values for a particular color
 

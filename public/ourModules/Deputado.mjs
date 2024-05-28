@@ -1,4 +1,4 @@
-import {colors} from './colors.mjs';
+import { colors } from './colors.mjs';
 import Detalhes from './Detalhes.mjs';
 
 export default class Deputado {
@@ -22,12 +22,46 @@ export default class Deputado {
 
     async setDetails(detailData) {
 
-        this.details = new Detalhes (detailData);
+        this.details = new Detalhes(detailData);
         this.details.set
         return Promise.resolve();
     }
+
+  
     async setB64Image(base64) {
-        this.imageB64 = `data:image/jpeg;base64,${base64}`;
+        // Decode the Base64 string
+        const imageBuffer = Buffer.from(base64, 'base64');
+
+        // Resize the image to width 357, keeping the aspect ratio
+        const resizedImageBuffer = await sharp(imageBuffer)
+            .resize({ width: 357 })
+            .toBuffer();
+
+        // Encode the resized image back to Base64
+        const resizedBase64 = resizedImageBuffer.toString('base64');
+
+        // Set the resized Base64 image
+        this.imageB64 = `data:image/jpeg;base64,${resizedBase64}`;
+
+        // Return a promise to indicate when image setting is complete
+        return Promise.resolve();
+    }
+
+    async setMissingImage(base64) {
+        // Decode the Base64 string
+        const imageBuffer = Buffer.from(base64, 'base64');
+
+        // Resize the image to width 357, keeping the aspect ratio
+        const resizedImageBuffer = await sharp(imageBuffer)
+            .resize({ width: 357 })
+            .toBuffer();
+
+        // Encode the resized image back to Base64
+        const resizedBase64 = resizedImageBuffer.toString('base64');
+
+        // Set the resized Base64 image
+        this.imageB64 = `data:image/jpeg;base64,${resizedBase64}`;
+
         // Return a promise to indicate when image setting is complete
         return Promise.resolve();
     }
