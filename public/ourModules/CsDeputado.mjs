@@ -7,7 +7,7 @@ export default class CsDeputado {
                 this.nome = obj.nomeEleitoral;
                 this.siglaPartido = obj.siglaPartido;
                 this.siglaUf = obj.siglaUf;
-                this.imageB64 = obj.imageB64;
+                this.imageB64Masked = obj.imageB64Masked;
                 this.image = null; // Initialize as null
                 // Load the image
                 this.makeP5Image();
@@ -24,7 +24,7 @@ export default class CsDeputado {
 
             makeP5Image() {
                 // Using a callback to handle asynchronous loading
-                loadImage(this.imageB64, (img) => {
+                loadImage(this.imageB64Masked, (img) => {
                     this.image = img; // Set the image when it's loaded
                 });
             }
@@ -36,7 +36,7 @@ export default class CsDeputado {
             showBadge(x, y) {
 
                 // Create p5.Image from Base64-encoded string
-                const face = this.image ? this.image : photoPlaceholder; //createImg(this.imageB64);
+                const face = this.image ? this.image : photoPlaceholder; //createImg(this.imageB64Masked);
                 // Create mask
                 const w = face.width;
                 const h = face.height;

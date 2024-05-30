@@ -39,10 +39,10 @@
         const __dirname = path.dirname(new URL(
             import.meta.url).pathname);
         const placeholderImage = path.join(__dirname, 'public', 'images', 'fotoPlaceHolder.jpg');
-        const interval = 2 * 60 * 60 * 1000; // 2hs em milliseconds;
+        const interval = 2 * 60 * 60 * 1000; // 2hs em milliseconds; // 
 
         //generic image 
-        const missingPhotoPath = path.join(__dirname, 'public', 'images', 'missingPhoto.jpg');
+        const missingPhotoPath = path.join(__dirname, 'public', 'images', 'missingPhoto.png');
         let missingPhotoBase64;
 
         //mask
@@ -71,7 +71,7 @@
                     "siglaPartido": dep.siglaPartido || null,
                     "siglaUf": dep.siglaUf || null,
                     "dataNascimento": dep.details.dataNascimento || null,
-                    "imageB64": dep.imageB64 || null,
+                    "imageB64Masked": dep.imageB64Masked || null,
                     "municipioNascimento": dep.details.municipioNascimento || null,
                     "escolaridade": dep.details.escolaridade || null,
                 }));
@@ -98,10 +98,12 @@
         // Load generic image
         const missingPhotoBuffer = fs.readFileSync(missingPhotoPath);
         missingPhotoBase64 = missingPhotoBuffer.toString('base64');
+        Deputado.missingPhotoBase64 = missingPhotoBase64;
         console.log("missingPhoto loaded");
         
         // Load the mask image
         maskImageBuffer = fs.readFileSync(maskImagePath);
+        Deputado.maskImageBuffer = maskImageBuffer;
         console.log("Mask image loaded");
 
 
@@ -314,10 +316,10 @@
                     });
 
                     // Convert response data to Base64
-                    const base64Image = Buffer.from(response.data, 'binary').toString('base64');
+                    const imageBuffer = Buffer.from(response.data, 'binary');
 
                     // Await the setB64Image method to resize and set the image
-                    await deputado.setB64Image(base64Image);
+                    await deputado.setB64Image(imageBuffer);
                 } catch (error) {
                     if (error.response) {
                         // The request was made and the server responded with a status code
@@ -361,6 +363,8 @@
 
                 saveData();
             } else {
+                await sharp(Buffer.from(servingData[Math.floor(Math.random()*(servingData.length-1))].imageB64Masked, 'base64'))
+            .toFile('test.png');
                 console.log(`there is no missing images or details to retrieve.`);
                 clearInterval(imageRetrieverTimer);
                 console.log(lastUpdateDate);
