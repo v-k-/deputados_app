@@ -62,10 +62,13 @@
 
         const app = express();
         app.get('/api/start', (req, res) => {
+            // servingData.map(dep => console.log(dep.imageB64Masked))
             // Check if lista has been populated with data
             if (servingData !== null) {
                 // If data exists, send it as the response
-                const initialData = servingData.map(dep => ({
+                const initialData = servingData.map(dep => (
+                {
+
                     "id": dep.id,
                     "nomeEleitoral": dep.details.ultimoStatus.nomeEleitoral || null,
                     "siglaPartido": dep.siglaPartido || null,
@@ -363,8 +366,6 @@
 
                 saveData();
             } else {
-                await sharp(Buffer.from(servingData[Math.floor(Math.random()*(servingData.length-1))].imageB64Masked, 'base64'))
-            .toFile('test.png');
                 console.log(`there is no missing images or details to retrieve.`);
                 clearInterval(imageRetrieverTimer);
                 console.log(lastUpdateDate);

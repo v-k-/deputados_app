@@ -37,7 +37,7 @@
                 // Validate the buffer
                 if (!buffer || !Buffer.isBuffer(buffer) || buffer.length === 0) {
                     // Set missing image here without stopping the program
-                    await this.setMissingImage(Deputado.missingPhotoBase64);
+                    this.imageB64Masked = `data:image/png;base64,${Deputado.missingPhotoBase64}`;
                     throw new Error('Invalid image buffer.');
                 }
                 const image = sharp(buffer);
@@ -50,7 +50,8 @@
 
                 // Encode the resized image to Base64
                 // and save the original image to base64
-                this.imageB64Original = resizedImageBuffer.toString('base64');
+                // const resizedBase64 = resizedImageBuffer.toString('base64');
+                // this.imageB64Original = `data:image/png;base64,${resizedBase64}`;
 
                 // Apply the circular mask to the image
                 const maskImageBuffer = Deputado.maskImageBuffer;
@@ -63,7 +64,7 @@
 
                 // Convert the masked image to base64
                 const maskedBase64 = maskedImageBuffer.toString('base64');
-                this.imageB64Masked = maskedBase64;
+                this.imageB64Masked = `data:image/png;base64,${maskedBase64}`;
 
                 // Return a promise to indicate when image setting is complete
                 return Promise.resolve();
