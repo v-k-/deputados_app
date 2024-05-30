@@ -62,7 +62,7 @@ export default function runP5() {
 // The singleton instance
 let grid, panels;
 import { deputados, lastUpdate, initialData } from './entry.mjs';
-import Deputado from './ourModules/Deputado.mjs';
+// import Deputado from './ourModules/Deputado.mjs';
 import CsDeputado from './ourModules/CsDeputado.mjs';
 import { colors } from './ourModules/colors.mjs'
 import Grid from './ourModules/Grid.mjs'

@@ -1,5 +1,6 @@
 import { colors } from './colors.mjs';
 import Detalhes from './Detalhes.mjs';
+import sharp from 'sharp';
 
 export default class Deputado {
     static p5 = null; // Static property to hold p5 instance reference
