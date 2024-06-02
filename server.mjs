@@ -2,6 +2,8 @@
         //////
         // - erro pra qd nao vem detalhes nao ficar tentendo pra sempre
         // - outros erros   pra não bloquear
+        // - tem q rver também a fuçano retriever, pq acho q nao tá bem pensada pra 
+        // - ser usada desincronizada - raciocinio de blocking code... acho
 
 
 
@@ -17,64 +19,184 @@
         import axios from 'axios';
         import fs from 'fs';
         import path from 'path';
-        import date from 'date-and-time';
+        // import date from 'date-and-time';
         import express from 'express';
         import sharp from 'sharp';
         import _ from 'lodash';
         // my modules
         import Deputado from './public/ourModules/Deputado.mjs';
+        import Partido from './public/ourModules/Partido.mjs';
         import * as arrayIO from './public/ourModules/arrayIO.js';
+        import { colors } from './public/ourModules/colors.mjs';
+
+        
+
+
+
 
         //****************************************
-        //____variables
-
+        // this is opal's port (deployment server's port)
         const port = 11208;
+
+        
+
+        
+
+        // === === API paths data
         const apiBase = 'https://dadosabertos.camara.leg.br/api/v2/';
         const apiDeputados = path.join(apiBase, 'deputados');
-        let servingData = [];
-        let loadingData = [];
-        const fileName = `lastestData.json`;
-        let lastUpdateDate = new Date(); // Default value for lastUpdateDate
-        const normalizedImageHeight = 470;
-        const __dirname = path.dirname(new URL(
-            import.meta.url).pathname);
-        const placeholderImage = path.join(__dirname, 'public', 'images', 'fotoPlaceHolder.jpg');
-        const interval = 2 * 60 * 60 * 1000; // 2hs em milliseconds; // 
+        const apiLegislatura = path.join(apiBase, 'legislaturas');
+        console.log('=apiL>', apiLegislatura); // Output or use the legislaturaId as needed
 
+        // === more paths
+        // in ES modules, __dirname is not available by default.
+        // This line creates a similar variable for ES modules.
+        const __dirname = path.dirname(new URL(import.meta.url).pathname);
+        
         //generic image 
-        const missingPhotoPath = path.join(__dirname, 'public', 'images', 'missingPhoto.png');
-        let missingPhotoBase64;
+        const missingPhotoPath = path.join(__dirname, 'public', 'images', 'appAssets', 'missingPhoto.png');
+        // let missingPhotoBase64;
 
         //mask
-        const maskImagePath = path.join(__dirname, 'public', 'images', 'faceMask.png');
-        let maskImageBuffer; //Buffer to store the mask image
+        const maskImagePath = path.join(__dirname, 'public', 'images', 'appAssets', 'faceMask.png');
+        // let maskImageBuffer; //Buffer to store the mask image
+
+
+        // === ===  Legislatura
+        
+        // get Legislatura, a  single int (57 = 2024) starting count from first legislatura
+        // so far i could just let API default to present one,
+        // but it might be good in future to have that sorted
+
+        // get and store it
+        let legislatura = await fetchLegislatura();
+        console.log('+>', legislatura);
+
+        async function fetchLegislatura() {
+            const today = getFormattedToday(); // Get today's date in YYYY-MM-DD format
+            try {
+                const response = await axios.get(apiLegislatura, {
+                    params: {
+                        data: today
+                    }
+                });
+                const legislaturaId = response.data.dados[0].id; // Access the required field in the response
+
+                console.log('==>', legislaturaId); // Output or use the legislaturaId as needed
+                return legislaturaId;
+            } catch (error) {
+                console.error('Error fetching legislatura:', error);
+            }
+        }
+
+
+
+
+
+        // === === Partidos
+        const apiPartidos = path.join(apiBase, 'partidos');
+        let partidos = []
+        const rawData = await fetchPartidos();
+        for(const partido of rawData){
+            partidos.push(new Partido(partido));
+        }
+        console.log('PARTIDOS:\n\nvvvv\n', partidos);
+      
+        async function fetchPartidos() {
+            try {
+                const rawPartidos = await getApiData(apiPartidos, {
+                    params: {
+                        idLegislatura: legislatura,
+                        itens: 100
+                    }
+                });
+
+                return rawPartidos;
+                // console.log(rawPartidos);
+
+
+            } catch (error) {
+                console.error('Error fetching PArtidos:', error);
+            }
+        }
+
+
+
+
+        // === === Server data stuff
+
+        // interval between default API query
+        // write details of this herer later
+        const interval = 2 * 60 * 60 * 1000; // 2hs em milliseconds; // 
+
+        // data to be serverd
+        let servingData = [];
+
+        // loading data for later hot swap
+        let loadingData = [];
+
+        // storing data  in files  (db?)
+        const fileName = `latestData.json`;
+        let lastUpdateDate = new Date(); // Default value for lastUpdateDate
+        
+        
+
 
         //error and tests 
         let testMode = false; // Test mode flag
         let throwFetchError = false;
 
+        // a var to keep track of retriver time 
         let imageRetrieverTimer;
+        
+        // just for server logging
         let timesSaved = 1;
 
 
-        //****************************************
+        
+                // Load generic image
+        const missingPhotoBuffer = fs.readFileSync(missingPhotoPath);
+        console.log("missingPhoto loaded");
+
+        // Load the mask image
+        const maskImageBuffer = fs.readFileSync(maskImagePath);
+        Deputado.maskImageBuffer = maskImageBuffer;
+        console.log("Mask image loaded");
+
+
+
+
+
+
+
+//************************************************************************************************************************
         //____server client communication
 
+        
+
+
+
+
+        //the app
         const app = express();
+        
+        // as soon as a client connects
         app.get('/api/start', (req, res) => {
-            // servingData.map(dep => console.log(dep.imageB64Masked))
+
             // Check if lista has been populated with data
             if (servingData !== null) {
-                // If data exists, send it as the response
-                const initialData = servingData.map(dep => (
-                {
+                // last data retrieved is available from file
+                // unless something has gone really bad... 
 
+                // If data exists, send it as the response
+                // we made a sub set of info
+                const initialData = servingData.map(dep => ({
                     "id": dep.id,
                     "nomeEleitoral": dep.details.ultimoStatus.nomeEleitoral || null,
                     "siglaPartido": dep.siglaPartido || null,
                     "siglaUf": dep.siglaUf || null,
                     "dataNascimento": dep.details.dataNascimento || null,
-                    "imageB64Masked": dep.imageB64Masked || null,
+                    "imagePath": dep.imagePath || null,
                     "municipioNascimento": dep.details.municipioNascimento || null,
                     "escolaridade": dep.details.escolaridade || null,
                 }));
@@ -91,30 +213,39 @@
         });
 
         app.listen(port, () => {
-            console.log(`Example app listening on port ${port}`)
+            console.log(`depuDados app listening on port ${port}`)
         })
 
+        // public is made public
         app.use(express.static('public'));
+        //as well as /ourModules
         app.use('/ourModules', express.static(path.join(__dirname, 'modules')));
 
 
-        // Load generic image
-        const missingPhotoBuffer = fs.readFileSync(missingPhotoPath);
-        missingPhotoBase64 = missingPhotoBuffer.toString('base64');
-        Deputado.missingPhotoBase64 = missingPhotoBase64;
-        console.log("missingPhoto loaded");
-        
-        // Load the mask image
-        maskImageBuffer = fs.readFileSync(maskImagePath);
-        Deputado.maskImageBuffer = maskImageBuffer;
-        console.log("Mask image loaded");
 
 
 
 
 
-        //****************************************
+
+
+
+
+
+//**********************************************************************************************************************
         //____Server's data handling 
+
+
+
+
+
+
+
+
+
+
+
+
 
         async function updateData() {
             // Load locally saved data and serve it right away
@@ -153,29 +284,31 @@
                     }
                 }
 
-
+                //some log tickling. .. ... . .. ...
                 const timer = setInterval(() => {
                     const f = ['...', '..', '.'];
                     const i = Math.floor(Math.random() * f.length); // Generate a random index within the array length
                     console.log(f[i]);
                 }, 5000);
 
-
-                console.log('Getting API data... hold on');
-                // Query API for a list of deputados first data
+                //
+                console.log("Getting Deputado's API data... hold on");
+                // Query Deputado's API for a list of deputados first data
                 loadingData = await makeDeputados(apiDeputados, {
                     params: {
                         itens: 100,
                     }
                 });
-                console.log('API data loaded');
+
+
+                console.log("Deputado's API data loaded");
 
                 console.log('Getting images, takes a while');
 
-                // Use acquired data to query API again for b64image
+                // Use acquired data to query API again for image
                 // We pass the whole array to be handled
                 await getImages(loadingData);
-                console.log('ImagesB64 loaded');
+                console.log('Images loaded');
 
 
 
@@ -217,9 +350,7 @@
                     const dados = response.data.dados;
                     const links = response.data.links;
 
-                    // instantiate Deputados and keep adding to array
-                    const objects = dados.map(dep => new Deputado(dep));
-                    temp.push(...objects);
+                    temp.push(...dados);
 
 
                     //get next link, if there's one
@@ -244,10 +375,15 @@
         }
 
 
+
+
+
+
         async function makeDeputados(url, params) {
             const rawData = await getApiData(url, params);
             return rawData.map(dep => (new Deputado(dep)));
         }
+
 
 
         async function getDetails(deputados) {
@@ -304,34 +440,35 @@
                 // Check if imageUrl is null
                 if (!deputado.urlFoto) {
                     console.log(`Image URL not available for ${deputado.nome}`);
-                    deputado.setB64Image(missingPhotoBase64);
+                    deputado.setMissingImage();
                     continue; // Skip to the next deputado
                 }
 
                 let url = deputado.urlFoto;
-                if (deputado.id === '220593' && throwFetchError) url = deputado.urlFoto + "numfa";
+
+                if (deputado.id === '220593' && throwFetchError) url = deputado.urlFoto + "Fake error -  numfa";
                 throwFetchError = false;
 
                 try {
-                    // Fetch the image as array buffer
-                    const response = await axios.get(url, {
-                        responseType: 'arraybuffer'
-                    });
+            
+            // Fetch the image as array buffer
+            const response = await axios.get(url, {
+                responseType: 'arraybuffer'
+            });
 
-                    // Convert response data to Base64
-                    const imageBuffer = Buffer.from(response.data, 'binary');
+            // Convert response data to Buffer
+            const imageBuffer = Buffer.from(response.data, 'binary');
 
-                    // Await the setB64Image method to resize and set the image
-                    await deputado.setB64Image(imageBuffer);
+            await deputado.setImage(imageBuffer);
                 } catch (error) {
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        deputado.setB64Image(missingPhotoBase64);
+                        deputado.setMissingImage();
                         console.log(`Error fetching image of ${deputado.id}`);
                         console.log(error.response.status);
                         console.log(error.response.headers);
-                        //  console.log(error.response.statusText);
+                        // console.log(error.response.statusText);
                         // console.log(error.response.config);
                     } else if (error.request) {
                         // The request was made but no response was received
@@ -356,25 +493,28 @@
 
             if (missingImagesDeputados.length > 0 || missingDetailsDeputados.length > 0) {
                 console.log(`there are ${missingImagesDeputados.length} missing images and ${missingDetailsDeputados.length} missing details to retrieve.`);
-                console.log(`attempting to retrieve b64image for ids`, missingImagesIds);
+                console.log(`attempting to retrieve image for ids`, missingImagesIds);
                 console.log(`attempting to retrieve details for ids`, missingDetailsIds);
 
-                await Promise.all([
-                    getImages(missingImagesDeputados),
-                    getDetails(missingDetailsDeputados)
-                ]);
-
-                saveData();
+                try {
+                    await Promise.all([
+                        getImages(missingImagesDeputados),
+                        getDetails(missingDetailsDeputados)
+                    ]);
+                    saveData();
+                } catch (error) {
+                    console.error('Error in retriever:', error.message);
+                }
             } else {
                 console.log(`there is no missing images or details to retrieve.`);
                 clearInterval(imageRetrieverTimer);
-                console.log(lastUpdateDate);
-                console.log(lastUpdateDate.toLocaleString())
+                console.log(lastUpdateDate.toLocaleString());
                 console.log("Server walker is now resting. |- _ -|");
-                const singplural = timesSaved === 1 ? 'vez' : 'timesSaved';
-                console.log(`Dados baixados ${timesSaved++} ${singplural} desde que o servidor iniciou.`)
+                const singplural = timesSaved === 1 ? 'vez' : 'vezes';
+                console.log(`Dados baixados ${timesSaved++} ${singplural} desde que o servidor iniciou.`);
             }
         }
+
 
 
         async function saveData() {
@@ -397,3 +537,18 @@
         }
 
         main();
+
+
+        function getFormattedToday() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+        }
+
+
+
+
+

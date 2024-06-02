@@ -75,6 +75,7 @@ let navLinks;
 let cnv;
 let resizeTimeout;
 let scrollOff = 0.0;
+let totalHeight = 0.0;
 
 function preload() {
     cnvHeight = calcCnvHeight();
@@ -84,6 +85,8 @@ function preload() {
             deputados.push(new CsDeputado(dep));
         });
     }
+
+
 }
 
 function setup() {
@@ -105,10 +108,8 @@ function setup() {
     const c = 10; // floor(random(1, 10));
     const r = 5; // floor(random(1, 6));
     imageMode(CENTER)
-    // background(140, 130, 40);
-    // deputados[13].showImage(100, 50);
-    // deputados[13].showBadge(100, 50);
-    console.log(deputados[13])
+    const h = (deputados[0].image.height + 10)
+    totalHeight = h * deputados.length + 1;
 }; // === === === --- -> eof setup
 
 
@@ -116,22 +117,17 @@ function setup() {
 function draw() {
     clear(140);
     // orbitControl(); 
-    const x = 200;
-    const y = 200;
     textSize(40);
     for (var i = 0; i < deputados.length; i++) {
-        const   dep = deputados[i];
-        const x = dep.badgeWidth*0.7;
-        const y = scrollOff + (dep.badgeWidth*1.6) * i
-        dep.showImage(x , y)
-        text(dep.nome, x + 30 + dep.badgeWidth/2 , y - 160 )
-        text(dep.siglaPartido, x + 30 + dep.badgeWidth/2 , y - 100 )
-        text(dep.municipioNascimento +" - "+ dep.siglaUf, x + 30 + dep.badgeWidth/2 , y - 40 )
-        const t  = dep.escolaridade ? dep.escolaridade : "sem dados";
-        text("escolaridade: "+ t, x + 30 + dep.badgeWidth/2 , y + 20 )
-        // console.log(dep);
-
-
+        const dep = deputados[i];
+        const x = dep.badgeWidth * 0.7;
+        const y = scrollOff + (dep.badgeWidth * 1.6) * i;
+        dep.showImage(x, y);
+        text(dep.nome, x + 30 + dep.badgeWidth / 2, y - 160);
+        text(dep.siglaPartido, x + 30 + dep.badgeWidth / 2, y - 100);
+        text(dep.municipioNascimento + " - " + dep.siglaUf, x + 30 + dep.badgeWidth / 2, y - 40);
+        const t = dep.escolaridade ? dep.escolaridade : "sem dados";
+        text("escolaridade: " + t, x + 30 + dep.badgeWidth / 2, y + 20);
     }
 }; // === === === --- -> eof draw
 

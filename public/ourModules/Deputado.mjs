@@ -1,6 +1,11 @@
     import { colors } from './colors.mjs';
     import Detalhes from './Detalhes.mjs';
     import sharp from 'sharp';
+    import path from 'path';
+    import fs from 'fs';
+    import { fileURLToPath } from 'url';
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
     export default class Deputado {
         static p5 = null; // Static property to hold p5 instance reference
@@ -19,8 +24,7 @@
             this.urlFoto = firstData.urlFoto || null;
             this.email = firstData.email || null;
             this.details = null;
-            this.imageB64Original = null;
-            this.imageB64Masked = null;
+            this.imagePath = null;
         }
 
 
@@ -32,12 +36,13 @@
         }
 
 
-        async setB64Image(buffer) {
+
+        async setImage(buffer) {
             try {
                 // Validate the buffer
                 if (!buffer || !Buffer.isBuffer(buffer) || buffer.length === 0) {
                     // Set missing image here without stopping the program
-                    this.imageB64Masked = `data:image/png;base64,${Deputado.missingPhotoBase64}`;
+                    this.imagePath = path.join(__dirname, '/', 'images', 'appAssets', `missingPhoto.png`);
                     throw new Error('Invalid image buffer.');
                 }
                 const image = sharp(buffer);
@@ -48,23 +53,30 @@
                     .toFormat('png') // Ensure the format is PNG to preserve alpha channel
                     .toBuffer();
 
-                // Encode the resized image to Base64
-                // and save the original image to base64
-                // const resizedBase64 = resizedImageBuffer.toString('base64');
-                // this.imageB64Original = `data:image/png;base64,${resizedBase64}`;
-
-                // Apply the circular mask to the image
+                //get the mask
                 const maskImageBuffer = Deputado.maskImageBuffer;
+
+                // ensure
                 if (!maskImageBuffer) {
                     throw new Error('Mask image buffer is not defined.');
                 }
+
+                // Apply the circular mask to the image
                 const maskedImageBuffer = await sharp(resizedImageBuffer)
                     .composite([{ input: maskImageBuffer, blend: 'dest-in' }])
                     .toBuffer();
 
-                // Convert the masked image to base64
-                const maskedBase64 = maskedImageBuffer.toString('base64');
-                this.imageB64Masked = `data:image/png;base64,${maskedBase64}`;
+                // Define the absolute path to save the image
+                const imagePath = path.join('/', 'images', 'maskedFaces', `${this.id}.png`);
+                const writePath = path.join(__dirname, '../', imagePath);
+                // Write the image buffer to a file
+                await fs.promises.writeFile(writePath, maskedImageBuffer);
+
+                // Set the imagePath property
+                this.imagePath = imagePath;
+
+                // Log success message
+                // console.log(`Image saved for ${this.nome} at ${imagePath}`);
 
                 // Return a promise to indicate when image setting is complete
                 return Promise.resolve();
@@ -75,24 +87,13 @@
                 // Continue program execution by returning a resolved promise
                 return Promise.resolve();
             }
-        }
+        } // eof setImage
 
-        async maskImage() {}
 
-        async setMissingImage(base64) {
-            // Decode the Base64 string
-            const imageBuffer = Buffer.from(base64, 'base64');
 
-            // Resize the image to width 357, keeping the aspect ratio
-            const resizedImageBuffer = await sharp(imageBuffer)
-                .resize({ width: 357 })
-                .toBuffer();
+        async setMissingImage() {
 
-            // Encode the resized image back to Base64
-            const resizedBase64 = resizedImageBuffer.toString('base64');
-
-            // Set the resized Base64 image
-            this.imageB64 = `data:image/jpeg;base64,${resizedBase64}`;
+            this.imagePath = path.join('/', 'images', 'appAssets', `missingPhoto.png`);
 
             // Return a promise to indicate when image setting is complete
             return Promise.resolve();
