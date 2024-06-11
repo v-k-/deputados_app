@@ -52,10 +52,9 @@ export default function runP5() {
     globalThis.setup = setup;
     globalThis.draw = draw;
     globalThis.windowResized = windowResized;
-    globalThis.keyPressed = keyPressed;
-    globalThis.mouseDragged = mouseDragged;
-    globalThis.mouseReleased = mouseReleased;
     globalThis.mousePressed = mousePressed;
+    globalThis.mouseReleased = mouseReleased;
+    globalThis.mouseDragged = mouseDragged;
     globalThis.mocha = 'Hack to block p5.js auto global instantiation.';
     p5.instance || new p5; // Globally instantiate p5.js if it hasn't already.
     globalThis._setupDone = void 0; // Suppress duplicate imported warning.
@@ -67,6 +66,7 @@ let grid, panels;
 import { deputados, lastUpdate, initialData } from './entry.mjs';
 // import Deputado from './ourModules/Deputado.mjs';
 import CsDeputado from './ourModules/CsDeputado.mjs';
+import Node from './ourModules/Node.mjs';
 import { colors } from './ourModules/colors.mjs'
 import Grid from './ourModules/Grid.mjs'
 
@@ -82,11 +82,10 @@ let totalHeight = 0.0;
 
 
 //new stuff for nodes
-let nodes = []
+export let nodes = []
 let nodesNumber = 520;
 
-const K = 1.2;
-const friction = 0.8;
+
 
 let zoom = 0.68;
 let dragPos;
@@ -116,18 +115,18 @@ let initialMousePos;
 //
 //  1 depu  0        100
 
-let forces = [
+export let forces = [
     [0, 0],
-    [5, -9]
+    [7, -9]
 ]
 
-let minDist = [
+export let minDist = [
     [-1, -1],
-    [270, 10]
+    [300, 10]
 ]
-let maxDist = [
+export let maxDist = [
     [0, 0],
-    [2000, 110]
+    [2000, 250]
 ]
 
 
@@ -163,40 +162,40 @@ function setup() {
 
     imageMode(CENTER)
 
-    for (var i = 0; i < bodiesNumber; i++) {
-        // bodies.push(new Body(random(180,220), random(180,220), 30, c));
-        bodies.push(new Body(random(-800, 800), random(-800, 800), 30, 'PARTIDO1'));
+    for (var i = 0; i < nodesNumber; i++) {
+        // nodes.push(new Body(random(180,220), random(180,220), 30, c));
+        nodes.push(new Node(random(-800, 800), random(-800, 800), 60, 'PARTIDO1'));
         if (random(1) > 0.7) {
-            bodies[i].partido = "PARTIDO2"
+            nodes[i].partido = "PARTIDO2"
         }
         if (random(1) > 0.9) {
-            bodies[i].partido = "PARTIDO3"
+            nodes[i].partido = "PARTIDO3"
         }
         if (random(1) > 0.8) {
-            bodies[i].partido = "PARTIDO4"
+            nodes[i].partido = "PARTIDO4"
         }
     }
     dragPos = createVector(0, 0);
 
-    bodies[0].mass = 100;
-    bodies[0].type = 0;
-    bodies[0].partido = 'PARTIDO2';
-    bodies[1].mass = 100;
-    bodies[1].type = 0;
-    bodies[1].partido = 'PARTIDO1';
-    bodies[2].mass = 100;
-    bodies[2].type = 0;
-    bodies[2].partido = 'PARTIDO3';
-    bodies[3].mass = 100;
-    bodies[3].type = 0;
-    bodies[3].partido = 'PARTIDO4';
+    nodes[0].mass = 120;
+    nodes[0].type = 0;
+    nodes[0].partido = 'PARTIDO2';
+    nodes[1].mass = 120;
+    nodes[1].type = 0;
+    nodes[1].partido = 'PARTIDO1';
+    nodes[2].mass = 120;
+    nodes[2].type = 0;
+    nodes[2].partido = 'PARTIDO3';
+    nodes[3].mass = 120;
+    nodes[3].type = 0;
+    nodes[3].partido = 'PARTIDO4';
 
 }; // === === === --- -> eof setup
 
 
 // draw
 function draw() {
-    background(255, 245, 255);
+    background(185, 146, 155);
     translate(width/2, height/2);
     scale(zoom);
     translate(dragPos.x , dragPos.y);
@@ -232,20 +231,20 @@ function windowResized() {
 
 function mousePressed() {
     initialMousePos = createVector(mouseX, mouseY);
-    bodySelected = false;
+    // bodySelected = false;
 
     for (let i = 0; i < nodes.length; i++) {
         if (nodes[i].isOver()) {
             nodes[i].select();
-            bodySelected = true;
+            // bodySelected = true;
             isDraggingCanvas = false;
             return;
-        }
+        }else{isDraggingCanvas = true;}
     }
 
-    if (!bodySelected) {
-        isDraggingCanvas = true;
-    }
+    // if (!bodySelected) {
+    //     isDraggingCanvas = true;
+    // }
 }
 
 function mouseReleased() {
@@ -253,7 +252,7 @@ function mouseReleased() {
         nodes[i].isSelected = false;
     }
     isDraggingCanvas = false;
-    bodySelected = false;
+    // bodySelected = false;
 }
 
 
@@ -340,7 +339,7 @@ function displaySorted(field) {
 
 
 
-function screenToWorld(x, y) {
+export function screenToWorld(x, y) {
     let worldX = (x - width / 2) / zoom - dragPos.x
     let worldY = (y - height / 2) / zoom - dragPos.y;
     return createVector(worldX, worldY);

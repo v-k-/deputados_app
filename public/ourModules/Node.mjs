@@ -1,3 +1,9 @@
+import {nodes} from '../globalP5.mjs'
+import {screenToWorld, minDist, maxDist, forces} from '../globalP5.mjs'
+
+const K = 1.2;
+const friction = 0.8;
+
 export default class Node {
     constructor(x, y, m, partido) {
         this.pos = createVector(x, y, 1);
@@ -23,7 +29,7 @@ export default class Node {
     }
 
     select() {
-        for (const b of bodies) {
+        for (const b of nodes) {
             b.isSelected = false
         }
         this.isSelected = true
@@ -46,7 +52,7 @@ export default class Node {
         let acc = createVector(0, 0);
         let dist = 0;
 
-        for (const body of bodies) {
+        for (const body of nodes) {
 
             if (body !== this && this.partido === body.partido) {
                 this.maxDist = maxDist[this.type][body.type];
@@ -126,12 +132,12 @@ export default class Node {
 
 display() {
         push();
-        noStroke()
-        fill(255, 30);
-        circle(this.pos.x, this.pos.y, this.maxDist)
-        stroke(255, 0, 0, 50);
-        fill(255, 250, 250, 20);
-        circle(this.pos.x, this.pos.y, this.minDist)
+        // noStroke()
+        // fill(255, 30);
+        // circle(this.pos.x, this.pos.y, this.maxDist)
+        // stroke(255, 0, 0, 50);
+        // fill(255, 250, 250, 20);
+        // circle(this.pos.x, this.pos.y, this.minDist)
         fill(this.dispColor);
         circle(this.pos.x, this.pos.y, this.mass);
 
@@ -149,3 +155,4 @@ display() {
         pop();
     }    
 }//<=== EOF NODE
+
