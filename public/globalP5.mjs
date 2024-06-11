@@ -53,6 +53,9 @@ export default function runP5() {
     globalThis.draw = draw;
     globalThis.windowResized = windowResized;
     globalThis.keyPressed = keyPressed;
+    globalThis.mouseDragged = mouseDragged;
+    globalThis.mouseReleased = mouseReleased;
+    globalThis.mousePressed = mousePressed;
     globalThis.mocha = 'Hack to block p5.js auto global instantiation.';
     p5.instance || new p5; // Globally instantiate p5.js if it hasn't already.
     globalThis._setupDone = void 0; // Suppress duplicate imported warning.
@@ -76,6 +79,58 @@ let cnv;
 let resizeTimeout;
 let scrollOff = 0.0;
 let totalHeight = 0.0;
+
+
+//new stuff for nodes
+let nodes = []
+let nodesNumber = 520;
+
+const K = 1.2;
+const friction = 0.8;
+
+let zoom = 0.68;
+let dragPos;
+
+let isDraggingCanvas = false;
+let initialMousePos;
+
+// caracteristicas são: minDist, maxDist, strength
+//   force
+//       part   depu
+//  part  0       1 
+//
+//  depu  0       -5
+//
+//////// 
+//
+//     minDist
+//       part    depu
+//  part  0       diameter
+//   
+//  depu  diam     diam
+//
+////////
+//      maxDist
+//       0-part     1-depu
+//  0 part  0        width
+//
+//  1 depu  0        100
+
+let forces = [
+    [0, 0],
+    [5, -9]
+]
+
+let minDist = [
+    [-1, -1],
+    [270, 10]
+]
+let maxDist = [
+    [0, 0],
+    [2000, 110]
+]
+
+
 
 function preload() {
     cnvHeight = calcCnvHeight();
@@ -103,32 +158,68 @@ function setup() {
         });
     });
 
-    cnv.mouseWheel(trackScroll)
+    cnv.mouseWheel(handleWheel)
 
-    const c = 10; // floor(random(1, 10));
-    const r = 5; // floor(random(1, 6));
+
     imageMode(CENTER)
-    const h = (deputados[0].image.height + 10)
-    totalHeight = h * deputados.length+1;
+
+    for (var i = 0; i < bodiesNumber; i++) {
+        // bodies.push(new Body(random(180,220), random(180,220), 30, c));
+        bodies.push(new Body(random(-800, 800), random(-800, 800), 30, 'PARTIDO1'));
+        if (random(1) > 0.7) {
+            bodies[i].partido = "PARTIDO2"
+        }
+        if (random(1) > 0.9) {
+            bodies[i].partido = "PARTIDO3"
+        }
+        if (random(1) > 0.8) {
+            bodies[i].partido = "PARTIDO4"
+        }
+    }
+    dragPos = createVector(0, 0);
+
+    bodies[0].mass = 100;
+    bodies[0].type = 0;
+    bodies[0].partido = 'PARTIDO2';
+    bodies[1].mass = 100;
+    bodies[1].type = 0;
+    bodies[1].partido = 'PARTIDO1';
+    bodies[2].mass = 100;
+    bodies[2].type = 0;
+    bodies[2].partido = 'PARTIDO3';
+    bodies[3].mass = 100;
+    bodies[3].type = 0;
+    bodies[3].partido = 'PARTIDO4';
+
 }; // === === === --- -> eof setup
 
 
 // draw
 function draw() {
-    clear(140);
-    // orbitControl(); 
-    textSize(40);
-    for (var i = 0; i < deputados.length; i++) {
-        const dep = deputados[i];
-        const x = dep.badgeWidth * 0.7;
-        const y = scrollOff + (dep.badgeWidth * 1.6) * i;
-        dep.showImage(x, y);
-        text(dep.nome, x + 30 + dep.badgeWidth / 2, y - 160);
-        text(dep.siglaPartido, x + 30 + dep.badgeWidth / 2, y - 100);
-        text(dep.municipioNascimento + " - " + dep.siglaUf, x + 30 + dep.badgeWidth / 2, y - 40);
-        const t = dep.escolaridade ? dep.escolaridade : "sem dados";
-        text("escolaridade: " + t, x + 30 + dep.badgeWidth / 2, y + 20);
+    background(255, 245, 255);
+    translate(width/2, height/2);
+    scale(zoom);
+    translate(dragPos.x , dragPos.y);
+
+    
+    for (const b of nodes) {
+        b.display();
+        b.update();
     }
+    // clear(140);
+    // // orbitControl(); 
+    // textSize(40);
+    // for (var i = 0; i < deputados.length; i++) {
+    //     const dep = deputados[i];
+    //     const x = dep.badgeWidth * 0.7;
+    //     const y = scrollOff + (dep.badgeWidth * 1.6) * i;
+    //     dep.showImage(x, y);
+    //     text(dep.nome, x + 30 + dep.badgeWidth / 2, y - 160);
+    //     text(dep.siglaPartido, x + 30 + dep.badgeWidth / 2, y - 100);
+    //     text(dep.municipioNascimento + " - " + dep.siglaUf, x + 30 + dep.badgeWidth / 2, y - 40);
+    //     const t = dep.escolaridade ? dep.escolaridade : "sem dados";
+    //     text("escolaridade: " + t, x + 30 + dep.badgeWidth / 2, y + 20);
+    // }
 }; // === === === --- -> eof draw
 
 
@@ -139,15 +230,51 @@ function windowResized() {
 };
 
 
-function keyPressed() {
+function mousePressed() {
+    initialMousePos = createVector(mouseX, mouseY);
+    bodySelected = false;
 
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].isOver()) {
+            nodes[i].select();
+            bodySelected = true;
+            isDraggingCanvas = false;
+            return;
+        }
+    }
+
+    if (!bodySelected) {
+        isDraggingCanvas = true;
+    }
+}
+
+function mouseReleased() {
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].isSelected = false;
+    }
+    isDraggingCanvas = false;
+    bodySelected = false;
+}
+
+
+function mouseDragged() {
+    if (isDraggingCanvas) {
+        let dx = mouseX - initialMousePos.x;
+        let dy = mouseY - initialMousePos.y;
+        dragPos.x += dx;
+        dragPos.y += dy;
+        initialMousePos.set(mouseX, mouseY);
+    }
 }
 
 
 
-function trackScroll() {
-    scrollOff += event.deltaY;
-    // redraw()
+function handleWheel() {
+    const d = event.deltaY / 500;
+    zoom += d
+    zoom = constrain(zoom, 0.1, 20);
+    maxDist[1][0] /= zoom * zoom * 0.2;
+    return false;
 }
 
 //   EOF P5 default functions
@@ -209,4 +336,18 @@ function displaySorted(field) {
         const y = Math.floor(i / badgesPerRow) * (badgeWidth + padding); // Calculate y coordinate
         depshowBadge(65 + x, 30 + y); // Call the showBadge method with calculated x and y
     }
+}
+
+
+
+function screenToWorld(x, y) {
+    let worldX = (x - width / 2) / zoom - dragPos.x
+    let worldY = (y - height / 2) / zoom - dragPos.y;
+    return createVector(worldX, worldY);
+}
+
+function worldToScreen(x, y) {
+    let screenX = (x * zoom) + dragPos.x + width / 2;
+    let screenY = (y * zoom) + dragPos.y + height / 2;
+    return createVector(screenX, screenY);
 }
