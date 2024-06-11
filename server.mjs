@@ -27,7 +27,6 @@
         import Deputado from './public/ourModules/Deputado.mjs';
         import Partido from './public/ourModules/Partido.mjs';
         import * as arrayIO from './public/ourModules/arrayIO.js';
-        import { colors } from './public/ourModules/colors.mjs';
 
         
 
@@ -98,10 +97,10 @@
         let partidos = []
         const rawData = await fetchPartidos();
         for(const partido of rawData){
-            partidos.push(new Partido(partido));
+            partidos.push( await Partido.create(partido));
         }
-        console.log('PARTIDOS:\n\nvvvv\n', partidos);
-      
+        // console.log('PARTIDOS:\n\nvvvv\n', partidos);
+        
         async function fetchPartidos() {
             try {
                 const rawPartidos = await getApiData(apiPartidos, {
@@ -143,7 +142,7 @@
 
 
         //error and tests 
-        let testMode = false; // Test mode flag
+        let testMode = true; // Test mode flag
         let throwFetchError = false;
 
         // a var to keep track of retriver time 
@@ -202,7 +201,8 @@
                 }));
                 res.json({
                     "deputados": initialData,
-                    "lastUpdateDate": lastUpdateDate
+                    "lastUpdateDate": lastUpdateDate,
+                    "partidos": partidos
                 });
             } else {
                 // If data does not exist, send an error response
@@ -263,10 +263,12 @@
             try {
                 // Load data from files
                 const thereIsData = fs.existsSync(fileName);
-                const thereisDate = fs.existsSync('lastUpdateDate.json');
+                const thereIsDate = fs.existsSync('lastUpdateDate.json');
+                const thereIsPartidos = fs.existsSync('partidosLastData.json');
 
-                if (thereIsData && thereisDate) {
+                if (thereIsData && thereIsDate && thereIsPartidos) {
                     servingData = await arrayIO.stRead(fileName);
+                    partidos = await arrayIO.stRead('partidosLastData.json');
                     const lastUpdateDateData = await fs.promises.readFile('lastUpdateDate.json');
                     const { timestamp } = JSON.parse(lastUpdateDateData);
                     lastUpdateDate = new Date(timestamp); // Convert back to Date object
@@ -282,7 +284,7 @@
 
                         return; // Exit function if in test mode
                     }
-                }
+                }else{console.log("!!!!!!!!!! 00 00 00 !!!!! !!!!")}
 
                 //some log tickling. .. ... . .. ...
                 const timer = setInterval(() => {
@@ -520,6 +522,7 @@
         async function saveData() {
             // Save new data to file both the array and the date
             await arrayIO.stWrite(servingData, fileName); // Write updated data to file
+            await arrayIO.stWrite(partidos, 'partidosLastData.json'); // Write updated data to file
             lastUpdateDate = new Date(); // Update last retrieved time
             const timestamp = lastUpdateDate.getTime(); // Convert to Unix timestamp
             await fs.promises.writeFile('lastUpdateDate.json', JSON.stringify({
@@ -531,12 +534,6 @@
 
 
 
-        async function main() {
-            await updateData();
-            setInterval(updateData, interval); // Twice a day
-        }
-
-        main();
 
 
         function getFormattedToday() {
@@ -549,6 +546,12 @@
         }
 
 
+        async function main() {
+            await updateData();
+            setInterval(updateData, interval); // Twice a day
+        }
+
+        main();
 
 
 

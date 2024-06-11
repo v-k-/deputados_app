@@ -109,7 +109,7 @@ function setup() {
     const r = 5; // floor(random(1, 6));
     imageMode(CENTER)
     const h = (deputados[0].image.height + 10)
-    totalHeight = h * deputados.length + 1;
+    totalHeight = h * deputados.length+1;
 }; // === === === --- -> eof setup
 
 
