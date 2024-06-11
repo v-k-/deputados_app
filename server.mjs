@@ -28,7 +28,7 @@
         import Partido from './public/ourModules/Partido.mjs';
         import * as arrayIO from './public/ourModules/arrayIO.js';
 
-        
+
 
 
 
@@ -37,21 +37,26 @@
         // this is opal's port (deployment server's port)
         const port = 11208;
 
-        
+        // the main timer
+        let mainTimer;
+        let retries = 0;
 
-        
+
+
 
         // === === API paths data
         const apiBase = 'https://dadosabertos.camara.leg.br/api/v2/';
         const apiDeputados = path.join(apiBase, 'deputados');
         const apiLegislatura = path.join(apiBase, 'legislaturas');
-        console.log('=apiL>', apiLegislatura); // Output or use the legislaturaId as needed
+
+        let apiIsUp
 
         // === more paths
         // in ES modules, __dirname is not available by default.
         // This line creates a similar variable for ES modules.
-        const __dirname = path.dirname(new URL(import.meta.url).pathname);
-        
+        const __dirname = path.dirname(new URL(
+            import.meta.url).pathname);
+
         //generic image 
         const missingPhotoPath = path.join(__dirname, 'public', 'images', 'appAssets', 'missingPhoto.png');
         // let missingPhotoBase64;
@@ -62,45 +67,64 @@
 
 
         // === ===  Legislatura
-        
+
         // get Legislatura, a  single int (57 = 2024) starting count from first legislatura
         // so far i could just let API default to present one,
         // but it might be good in future to have that sorted
 
         // get and store it
-        let legislatura = await fetchLegislatura();
-        console.log('+>', legislatura);
+        let legislatura = 57; // == == == == == == == == == == == CHANGE THIS TO SAVED DATA
+        // console.log('+>', legislatura);
 
+        async function testAPI() {
+            try {
+                console.log('testing api base url')
+                const response = await axios.get(apiBase, {
+                    timeout: 10000,
+                });
+                apiIsUp = true;
+                console.log("API is up.")
+            } catch (error) {
+                if (error.status > 500) {
+                    console.error("API is not responding:", error.toJSON())
+                    apiIsUp = false;
+                }
+            }
+            return apiIsUp;
+        }
         async function fetchLegislatura() {
             const today = getFormattedToday(); // Get today's date in YYYY-MM-DD format
             try {
                 const response = await axios.get(apiLegislatura, {
                     params: {
                         data: today
-                    }
+
+                    },
+                    timeout: 10000,
                 });
                 const legislaturaId = response.data.dados[0].id; // Access the required field in the response
-
-                console.log('==>', legislaturaId); // Output or use the legislaturaId as needed
+                console.log('Legislatura ==>', legislaturaId);
                 return legislaturaId;
             } catch (error) {
-                console.error('Error fetching legislatura:', error);
+                console.error('\n\nError fetching legislatura:\n', error.toJSON());
+                return ''; // Ensure a value is returned in case of error
             }
         }
-
-
-
 
 
         // === === Partidos
         const apiPartidos = path.join(apiBase, 'partidos');
         let partidos = []
-        const rawData = await fetchPartidos();
-        for(const partido of rawData){
-            partidos.push( await Partido.create(partido));
+
+
+
+        async function makePartidos() {
+            const rawData = await fetchPartidos();
+            for (const partido of rawData) {
+                partidos.push(await Partido.create(partido));
+            }
         }
-        // console.log('PARTIDOS:\n\nvvvv\n', partidos);
-        
+
         async function fetchPartidos() {
             try {
                 const rawPartidos = await getApiData(apiPartidos, {
@@ -109,13 +133,10 @@
                         itens: 100
                     }
                 });
-
                 return rawPartidos;
-                // console.log(rawPartidos);
-
-
             } catch (error) {
-                console.error('Error fetching PArtidos:', error);
+                console.error('Error fetching Partidos:', error);
+                return []; // Ensure an empty array is returned in case of error
             }
         }
 
@@ -137,8 +158,8 @@
         // storing data  in files  (db?)
         const fileName = `latestData.json`;
         let lastUpdateDate = new Date(); // Default value for lastUpdateDate
-        
-        
+
+
 
 
         //error and tests 
@@ -147,13 +168,13 @@
 
         // a var to keep track of retriver time 
         let imageRetrieverTimer;
-        
+
         // just for server logging
         let timesSaved = 1;
 
 
-        
-                // Load generic image
+
+        // Load generic image
         const missingPhotoBuffer = fs.readFileSync(missingPhotoPath);
         console.log("missingPhoto loaded");
 
@@ -168,17 +189,17 @@
 
 
 
-//************************************************************************************************************************
+        //************************************************************************************************************************
         //____server client communication
 
-        
+
 
 
 
 
         //the app
         const app = express();
-        
+
         // as soon as a client connects
         app.get('/api/start', (req, res) => {
 
@@ -190,14 +211,15 @@
                 // If data exists, send it as the response
                 // we made a sub set of info
                 const initialData = servingData.map(dep => ({
-                    "id": dep.id,
-                    "nomeEleitoral": dep.details.ultimoStatus.nomeEleitoral || null,
+                    "id": dep?.id || null,
+                    "nome": dep?.nome || null,
+                    "nomeEleitoral": dep.details?.ultimoStatus?.nomeEleitoral || null,
                     "siglaPartido": dep.siglaPartido || null,
-                    "siglaUf": dep.siglaUf || null,
-                    "dataNascimento": dep.details.dataNascimento || null,
-                    "imagePath": dep.imagePath || null,
-                    "municipioNascimento": dep.details.municipioNascimento || null,
-                    "escolaridade": dep.details.escolaridade || null,
+                    "siglaUf": dep?.siglaUf || null,
+                    "dataNascimento": dep.details?.dataNascimento || null,
+                    "imagePath": dep?.imagePath || null,
+                    "municipioNascimento": dep.details?.municipioNascimento || null,
+                    "escolaridade": dep.details?.escolaridade || null
                 }));
                 res.json({
                     "deputados": initialData,
@@ -232,7 +254,7 @@
 
 
 
-//**********************************************************************************************************************
+        //**********************************************************************************************************************
         //____Server's data handling 
 
 
@@ -260,6 +282,7 @@
             console.log(`_        Lets get some data         _`);
             console.log(`_                                  ==`);
             console.log(`==               -                 ==`);
+            retries = 0;
             try {
                 // Load data from files
                 const thereIsData = fs.existsSync(fileName);
@@ -284,56 +307,75 @@
 
                         return; // Exit function if in test mode
                     }
-                }else{console.log("!!!!!!!!!! 00 00 00 !!!!! !!!!")}
-
-                //some log tickling. .. ... . .. ...
-                const timer = setInterval(() => {
-                    const f = ['...', '..', '.'];
-                    const i = Math.floor(Math.random() * f.length); // Generate a random index within the array length
-                    console.log(f[i]);
-                }, 5000);
-
-                //
-                console.log("Getting Deputado's API data... hold on");
-                // Query Deputado's API for a list of deputados first data
-                loadingData = await makeDeputados(apiDeputados, {
-                    params: {
-                        itens: 100,
-                    }
-                });
+                } else {
+                    console.log(`Data File is missing? ${thereIsData}\nDate File is missing? ${thereIsDate}\nPartidos File is missing? ${thereIsPartidos} `)
+                }
+                // is API online?
+                if (testAPI()) {
+                    console.log('asking API for Legislatura.')
+                    //some log tickling. .. ... . .. ...
+                    const timer = setInterval(() => {
+                        const f = ['...', '..', '.'];
+                        const i = Math.floor(Math.random() * f.length); // Generate a random index within the array length
+                        console.log(f[i]);
+                    }, 5000);
 
 
-                console.log("Deputado's API data loaded");
+                    legislatura = await fetchLegislatura();
+                    console.log('Legislatura fetched:', legislatura);
 
-                console.log('Getting images, takes a while');
+                    await makePartidos();
+                    console.log('Partidos fetched:', partidos);
 
-                // Use acquired data to query API again for image
-                // We pass the whole array to be handled
-                await getImages(loadingData);
-                console.log('Images loaded');
-
-
-
-                console.log('Getting details... hold tight');
-                // Use acquired data to query API again for details
-                // We pass the whole array to be handled
-                await getDetails(loadingData);
-                console.log('details loaded');
-                // Update data being served
-                servingData = [...loadingData];
+                    //
+                    console.log("Getting Deputado's API data... hold on");
+                    // Query Deputado's API for a list of deputados first data
+                    loadingData = await makeDeputados(apiDeputados, {
+                        params: {
+                            itens: 100,
+                        }
+                    });
 
 
-                imageRetrieverTimer = setInterval(retriever, 5000);
-                saveData();
-                console.log(`Serving new data updated at ${lastUpdateDate}`);
-                clearTimeout(timer);
+                    console.log("Deputado's API data loaded");
+
+                    console.log('Getting images, takes a while');
+
+                    // Use acquired data to query API again for image
+                    // We pass the whole array to be handled
+                    await getImages(loadingData);
+                    console.log('Images loaded');
 
 
+
+                    console.log('Getting details... hold tight');
+                    // Use acquired data to query API again for details
+                    // We pass the whole array to be handled
+                    await getDetails(loadingData);
+                    console.log('details loaded');
+                    // Update data being served
+                    servingData = [...loadingData];
+
+
+                    imageRetrieverTimer = setInterval(retriever, 5000);
+                    saveData();
+                    console.log(`Serving new data updated at ${lastUpdateDate}`);
+                    clearTimeout(timer);
+
+                } else {
+                    console.log('API is dow, serving saved data. Will retry in half an hour');
+                    clearInterval(mainTimer)
+                    mainTimer = setInterval(updateData, 30 * 60 * 60 * 1000); // half an hour
+
+                }
 
             } catch (error) {
                 console.error('Error:', error);
             }
-        }
+            clearInterval(mainTimer)
+            mainTimer = setInterval(updateData, interval); // half an hour
+            console.log('API is up, serving new data. Will refresh in 12 hs');
+        } //<=== eof updateData()
 
 
 
@@ -452,16 +494,16 @@
                 throwFetchError = false;
 
                 try {
-            
-            // Fetch the image as array buffer
-            const response = await axios.get(url, {
-                responseType: 'arraybuffer'
-            });
 
-            // Convert response data to Buffer
-            const imageBuffer = Buffer.from(response.data, 'binary');
+                    // Fetch the image as array buffer
+                    const response = await axios.get(url, {
+                        responseType: 'arraybuffer'
+                    });
 
-            await deputado.setImage(imageBuffer);
+                    // Convert response data to Buffer
+                    const imageBuffer = Buffer.from(response.data, 'binary');
+
+                    await deputado.setImage(imageBuffer);
                 } catch (error) {
                     if (error.response) {
                         // The request was made and the server responded with a status code
@@ -493,21 +535,32 @@
             const missingImagesIds = missingImagesDeputados.map(item => item.id);
             const missingDetailsIds = missingDetailsDeputados.map(item => item.id);
 
-            if (missingImagesDeputados.length > 0 || missingDetailsDeputados.length > 0) {
+            if (missingImagesDeputados.length > 0 || missingDetailsDeputados.length > 0 && retries < 5) {
                 console.log(`there are ${missingImagesDeputados.length} missing images and ${missingDetailsDeputados.length} missing details to retrieve.`);
                 console.log(`attempting to retrieve image for ids`, missingImagesIds);
                 console.log(`attempting to retrieve details for ids`, missingDetailsIds);
-
+                retries++;
+                console.log(`this is retry number ${retries} of 5`)
                 try {
                     await Promise.all([
                         getImages(missingImagesDeputados),
                         getDetails(missingDetailsDeputados)
                     ]);
-                    saveData();
                 } catch (error) {
                     console.error('Error in retriever:', error.message);
                 }
+            } else if (missingImagesDeputados.length > 0 || missingDetailsDeputados.length > 0) {
+                console.log(`there are ${missingImagesDeputados.length} missing images and ${missingDetailsDeputados.length} missing details to retrieve.`);
+                console.log(`But the data is not available, will retry in next dataUpdate`)
+                clearInterval(imageRetrieverTimer);
+                console.log(lastUpdateDate.toLocaleString());
+                console.log("Server walker is now resting. |- _ -|");
+                const singplural = timesSaved === 1 ? 'vez' : 'vezes';
+                console.log(`Dados baixados ${timesSaved++} ${singplural} desde que o servidor iniciou.`);
+                return
+
             } else {
+
                 console.log(`there is no missing images or details to retrieve.`);
                 clearInterval(imageRetrieverTimer);
                 console.log(lastUpdateDate.toLocaleString());
@@ -515,6 +568,7 @@
                 const singplural = timesSaved === 1 ? 'vez' : 'vezes';
                 console.log(`Dados baixados ${timesSaved++} ${singplural} desde que o servidor iniciou.`);
             }
+            saveData();
         }
 
 
@@ -547,11 +601,12 @@
 
 
         async function main() {
-            await updateData();
-            setInterval(updateData, interval); // Twice a day
+            console.log('server___|- _ o|___ starting___|o _ O|___')
+            try {
+                await updateData();
+            } catch (error) {
+                console.error('Error in main:', error.toJSON());
+            }
         }
 
         main();
-
-
-

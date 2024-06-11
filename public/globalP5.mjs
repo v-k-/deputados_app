@@ -63,7 +63,7 @@ export default function runP5() {
 
 // The singleton instance
 let grid, panels;
-import { deputados, lastUpdate, initialData } from './entry.mjs';
+import { partidos, formattedDateTime, initialDepData } from './entry.mjs';
 // import Deputado from './ourModules/Deputado.mjs';
 import CsDeputado from './ourModules/CsDeputado.mjs';
 import Node from './ourModules/Node.mjs';
@@ -73,6 +73,7 @@ import Grid from './ourModules/Grid.mjs'
 
 // p5 scope vars
 let cnvHeight;
+let deputados = [];
 let sorter = 'siglaPartido';
 let navLinks;
 let cnv;
@@ -134,8 +135,8 @@ export let maxDist = [
 function preload() {
     cnvHeight = calcCnvHeight();
     // console.log('cnvHeight:', cnvHeight);
-    if (initialData.length > 0) {
-        initialData.map(dep => {
+    if (initialDepData.length > 0) {
+        initialDepData.map(dep => {
             deputados.push(new CsDeputado(dep));
         });
     }
@@ -189,7 +190,9 @@ function setup() {
     nodes[3].mass = 120;
     nodes[3].type = 0;
     nodes[3].partido = 'PARTIDO4';
-
+const ids = getUniqueSiglasPartido(initialDepData)
+console.log(ids.length,ids);
+console.log(partidos);
 }; // === === === --- -> eof setup
 
 
@@ -349,4 +352,13 @@ function worldToScreen(x, y) {
     let screenX = (x * zoom) + dragPos.x + width / 2;
     let screenY = (y * zoom) + dragPos.y + height / 2;
     return createVector(screenX, screenY);
+}
+
+
+function getUniqueSiglasPartido(data) {
+    const uniqueSiglas = new Set(); // Using a Set to automatically handle uniqueness
+    data.forEach(item => {
+        uniqueSiglas.add(item.siglaPartido);
+    });
+    return Array.from(uniqueSiglas); // Convert the Set back to an array
 }

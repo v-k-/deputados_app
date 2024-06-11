@@ -1,9 +1,9 @@
 import runP5 from './globalP5.mjs';
 
 
-export let deputados = [];
-export let lastUpdate = '';
-export let initialData = []
+export let partidos  = [];
+export let formattedDateTime= '';
+export let initialDepData = []
 
 
 
@@ -13,20 +13,24 @@ function getInitialData() {
         .then(response => {
             // Handle success
             console.log('Data received from server:');
-            initialData = response.data.deputados
-            console.log("Hereby", initialData);
-            const lastUpdate = new Date(response.data.lastUpdate);
-            const formattedDate = lastUpdate.toLocaleDateString(undefined, {
+            initialDepData = response.data.deputados
+            partidos = response.data.deputados
+
+            console.log("Hereby", initialDepData);
+            const lastUpdateDate = new Date(response.data.lastUpdateDate);
+            console.log(lastUpdateDate)
+            const formattedDate = lastUpdateDate.toLocaleDateString(undefined, {
                 day: '2-digit',
                 month: '2-digit',
                 year: '2-digit'
             });
-            const formattedTime = lastUpdate.toLocaleTimeString(undefined, {
+            const formattedTime = lastUpdateDate.toLocaleTimeString(undefined, {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
             });
-            const formattedDateTime = `${formattedDate} as ${formattedTime}`;
+            formattedDateTime = `${formattedDate} as ${formattedTime}`;
+            console.log(formattedDateTime)
             document.getElementById('ultima').textContent = `dados atualizados em: ${formattedDateTime}`
             runP5();
 
