@@ -116,20 +116,20 @@ let initialMousePos;
 //       0-part     1-depu
 //  0 part  0        width
 //
-//  1 depu  0        100
+//  1 depu  0        10050
 
 export let forces = [
-    [0, 0],
-    [7, -9]
+    [-7, 8],
+    [7, -12 ]
 ]
 
 export let minDist = [
-    [-1, -1],
-    [300,10]
+    [500, -1],
+    [300,0]
 ]
 export let maxDist = [
-    [0, 0],
-    [9000, 800]
+    [2700, 0],
+    [19000, 800]
 ]
 
 

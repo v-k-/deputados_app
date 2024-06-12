@@ -68,64 +68,66 @@ export default class Node {
 
         for (const body of nodes) {
 
-            if (body !== this && this.partido === body.partido) {
-                this.maxDist = maxDist[this.type][body.type];
-                this.minDist = minDist[this.type][body.type]
-                // console.log(body)
-                //clear for this particle
-                dir.mult(0);
+            if (body !== this) {
+                if (this.partido === body.partido || this.type === 0) {
+                    this.maxDist = maxDist[this.type][body.type];
+                    this.minDist = minDist[this.type][body.type]
+                    // console.log(body)
+                    //clear for this particle
+                    dir.mult(0);
 
-                //copy to keep from messing origina value
-                dir = body.pos.copy();
+                    //copy to keep from messing origina value
+                    dir = body.pos.copy();
 
-                // get dir to other
-                dir.sub(this.pos);
+                    // get dir to other
+                    dir.sub(this.pos);
 
-                //store distance before normalizing
-                dist = dir.mag();
+                    //store distance before normalizing
+                    dist = dir.mag();
 
-                //normalize
-                dir.normalize();
+                    //normalize
+                    dir.normalize();
 
 
-                //repel based on dist
-                if (dist < minDist[this.type][body.type]) {
-                    this.dispColor = this.color2
-                    // don't mess with dir
-                    const force = dir.copy();
+                    //repel based on dist
+                    if (dist < minDist[this.type][body.type]) {
+                        this.dispColor = this.color2
+                        // don't mess with dir
+                        const force = dir.copy();
 
-                    // an arbitrary value - in the example we had a table with a unique
-                    // value for each combination. Let's see what i'll need...
-                    force.mult(forces[this.type][body.type] * -3); // negative => repel
+                        // an arbitrary value - in the example we had a table with a unique
+                        // value for each combination. Let's see what i'll need...
+                        force.mult(forces[this.type][body.type] * -3); // negative => repel
 
-                    //map dist to positive 0~1 and multiply
-                    const mappedD = abs(map(dist, 0, this.minDist, 1, 0)); // <== note 1 e 0  not 0 e 1
-                    force.mult(mappedD);
+                        //map dist to positive 0~1 and multiply
+                        const mappedD = abs(map(dist, 0, this.minDist, 1, 0)); // <== note 1 e 0  not 0 e 1
+                        force.mult(mappedD);
 
-                    // a constant to scale down the forces 0.5 in the example
-                    force.mult(K)
+                        // a constant to scale down the forces 0.5 in the example
+                        force.mult(K)
 
-                    //accumulate all the forces of all other particles interacting with this one
-                    totalForce.add(force);
-                }
-                if (dist < maxDist[this.type][body.type]) {
-                    this.dispColor = this.color3;
-                    // don't mess with dir
-                    const force = dir.copy();
+                        //accumulate all the forces of all other particles interacting with this one
+                        totalForce.add(force);
+                    }
+                    if (dist < maxDist[this.type][body.type]) {
+                        this.dispColor = this.color3;
+                        // don't mess with dir
+                        const force = dir.copy();
 
-                    // an arbitrary value - in the example we had a table with a unique
-                    // value for each combination. Let's see what i'll need...
-                    force.mult(forces[this.type][body.type]);
+                        // an arbitrary value - in the example we had a table with a unique
+                        // value for each combination. Let's see what i'll need...
+                        force.mult(forces[this.type][body.type]);
 
-                    //map dist to positive 0~1 and multiply
-                    const mappedD = abs(map(dist, 0, maxDist[this.type][body.type], 1, 0)); // <== note 1 e 0  not 0 e 1
-                    force.mult(mappedD);
+                        //map dist to positive 0~1 and multiply
+                        const mappedD = abs(map(dist, 0, maxDist[this.type][body.type], 1, 0)); // <== note 1 e 0  not 0 e 1
+                        force.mult(mappedD);
 
-                    // a constant to scale down the forces 0.5 in the example
-                    force.mult(K)
+                        // a constant to scale down the forces 0.5 in the example
+                        force.mult(K)
 
-                    //accumulate all the forces of all other particles interacting with this one
-                    totalForce.add(force);
+                        //accumulate all the forces of all other particles interacting with this one
+                        totalForce.add(force);
+                    }
                 }
             }
         }
@@ -154,19 +156,19 @@ export default class Node {
         // circle(this.pos.x, this.pos.y, this.minDist)
 
         if (this.deputado) {
-            fill(60,60,60);
-        circle(this.pos.x-2 , this.pos.y-20, this.mass*1.8  );
+            fill(60, 60, 60);
+            circle(this.pos.x - 2, this.pos.y - 20, this.mass * 1.8);
 
-            image(this.deputado.image, this.pos.x, this.pos.y, this.mass, this.mass*1.33);
-        }else{
-        fill(190);
-        circle(this.pos.x, this.pos.y, this.mass);
+            image(this.deputado.image, this.pos.x, this.pos.y, this.mass, this.mass * 1.33);
+        } else {
+            fill(190);
+            circle(this.pos.x, this.pos.y, this.mass);
         }
 
-        if (this.type === 0){
+        if (this.type === 0) {
             fill(0)
             textSize(170)
-            text( this.partido, this.pos.x - 40 , this.pos.y );
+            text(this.partido, this.pos.x - 40, this.pos.y);
         }
 
         // if (this.type === 1) {
