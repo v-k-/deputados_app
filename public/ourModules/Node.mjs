@@ -1,5 +1,5 @@
-import {nodes} from '../globalP5.mjs'
-import {screenToWorld, minDist, maxDist, forces} from '../globalP5.mjs'
+import { nodes } from '../globalP5.mjs'
+import { screenToWorld, minDist, maxDist, forces } from '../globalP5.mjs'
 
 const K = 1.2;
 const friction = 0.8;
@@ -25,7 +25,21 @@ export default class Node {
         this.color3 = color(11, 5, 6, 50)
         this.dispColor = this.color1;
 
+        this.deputado = null;
 
+
+    }
+
+    static makeFromCsDeputado(dep) {
+        const n = new Node(random(-900, 900), random(-900, 900), 200, dep.siglaPartido);
+        n.deputado = dep;
+        return n;
+    }
+
+    static makeFromPartido(sigla, pos) {
+        const n = new Node(pos.x, pos.y, 550, sigla);
+        // n.deputado = dep;
+        return n;
     }
 
     select() {
@@ -115,22 +129,22 @@ export default class Node {
                 }
             }
         }
-        
+
         acc.add(totalForce); // if mass totalForce/this.mass
         this.vel.add(acc);
         this.pos.add(
-        	this.vel);
+            this.vel);
         this.vel.mult(friction);
-        
+
         if (this.isSelected) {
-        let worldMouse = screenToWorld(mouseX, mouseY);
+            let worldMouse = screenToWorld(mouseX, mouseY);
             this.pos.x = worldMouse.x;
             this.pos.y = worldMouse.y;
         }
     }
 
 
-display() {
+    display() {
         push();
         // noStroke()
         // fill(255, 30);
@@ -138,8 +152,22 @@ display() {
         // stroke(255, 0, 0, 50);
         // fill(255, 250, 250, 20);
         // circle(this.pos.x, this.pos.y, this.minDist)
-        fill(this.dispColor);
+
+        if (this.deputado) {
+            fill(60,60,60);
+        circle(this.pos.x-2 , this.pos.y-20, this.mass*1.8  );
+
+            image(this.deputado.image, this.pos.x, this.pos.y, this.mass, this.mass*1.33);
+        }else{
+        fill(190);
         circle(this.pos.x, this.pos.y, this.mass);
+        }
+
+        if (this.type === 0){
+            fill(0)
+            textSize(170)
+            text( this.partido, this.pos.x - 40 , this.pos.y );
+        }
 
         // if (this.type === 1) {
         //     image(img, this.pos.x, this.pos.y);
@@ -153,6 +181,5 @@ display() {
 
         if (this.isOver()) { rect(this.pos.x, this.pos.y, 20, 20) }
         pop();
-    }    
-}//<=== EOF NODE
-
+    }
+} //<=== EOF NODE

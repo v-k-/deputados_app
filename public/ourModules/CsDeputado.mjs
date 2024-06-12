@@ -1,4 +1,6 @@
 import { colors } from './colors.mjs';
+import  Node  from './Node.mjs';
+import {nodes} from '../globalP5.mjs'
 
 
 export default class CsDeputado {
@@ -14,6 +16,9 @@ export default class CsDeputado {
         this.dataNascimento = obj.dataNascimento;
         this.municipioNascimento = obj.municipioNascimento
         this.escolaridade = obj.escolaridade
+        this.node = Node.makeFromCsDeputado(this);
+        nodes.push(this.node);
+
 
 
 

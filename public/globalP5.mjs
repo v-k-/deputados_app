@@ -61,8 +61,9 @@ export default function runP5() {
 }
 
 
+
 // The singleton instance
-let grid, panels;
+let grid = []
 import { partidos, formattedDateTime, initialDepData } from './entry.mjs';
 // import Deputado from './ourModules/Deputado.mjs';
 import CsDeputado from './ourModules/CsDeputado.mjs';
@@ -74,6 +75,7 @@ import Grid from './ourModules/Grid.mjs'
 // p5 scope vars
 let cnvHeight;
 let deputados = [];
+let partidosAtivos = []
 let sorter = 'siglaPartido';
 let navLinks;
 let cnv;
@@ -88,7 +90,7 @@ let nodesNumber = 520;
 
 
 
-let zoom = 0.68;
+let zoom = 0.1;
 let dragPos;
 
 let isDraggingCanvas = false;
@@ -123,11 +125,11 @@ export let forces = [
 
 export let minDist = [
     [-1, -1],
-    [300, 10]
+    [300,10]
 ]
 export let maxDist = [
     [0, 0],
-    [2000, 250]
+    [9000, 800]
 ]
 
 
@@ -162,43 +164,44 @@ function setup() {
 
 
     imageMode(CENTER)
-
-    for (var i = 0; i < nodesNumber; i++) {
-        // nodes.push(new Body(random(180,220), random(180,220), 30, c));
-        nodes.push(new Node(random(-800, 800), random(-800, 800), 60, 'PARTIDO1'));
-        if (random(1) > 0.7) {
-            nodes[i].partido = "PARTIDO2"
-        }
-        if (random(1) > 0.9) {
-            nodes[i].partido = "PARTIDO3"
-        }
-        if (random(1) > 0.8) {
-            nodes[i].partido = "PARTIDO4"
-        }
-    }
     dragPos = createVector(0, 0);
+    makePartidosNodes();
+    console.log(partidosAtivos)
 
-    nodes[0].mass = 120;
-    nodes[0].type = 0;
-    nodes[0].partido = 'PARTIDO2';
-    nodes[1].mass = 120;
-    nodes[1].type = 0;
-    nodes[1].partido = 'PARTIDO1';
-    nodes[2].mass = 120;
-    nodes[2].type = 0;
-    nodes[2].partido = 'PARTIDO3';
-    nodes[3].mass = 120;
-    nodes[3].type = 0;
-    nodes[3].partido = 'PARTIDO4';
-const ids = getUniqueSiglasPartido(initialDepData)
-console.log(ids.length,ids);
-console.log(partidos);
+
+    // for (var i = 0; i < nodesNumber; i++) {
+    //     // nodes.push(new Body(random(180,220), random(180,220), 30, c));
+    //     nodes.push(new Node(random(-800, 800), random(-800, 800), 60, 'PARTIDO1'));
+    //     if (random(1) > 0.7) {
+    //         nodes[i].partido = "PARTIDO2"
+    //     }
+    //     if (random(1) > 0.9) {
+    //         nodes[i].partido = "PARTIDO3"
+    //     }
+    //     if (random(1) > 0.8) {
+    //         nodes[i].partido = "PARTIDO4"
+    //     }
+    // }
+
+    // nodes[0].mass = 120;
+    // nodes[0].type = 0;
+    // nodes[0].partido = 'PARTIDO2';
+    // nodes[1].mass = 120;
+    // nodes[1].type = 0;
+    // nodes[1].partido = 'PARTIDO1';
+    // nodes[2].mass = 120;
+    // nodes[2].type = 0;
+    // nodes[2].partido = 'PARTIDO3';
+    // nodes[3].mass = 120;
+    // nodes[3].type = 0;
+    // nodes[3].partido = 'PARTIDO4';
+console.log(deputados);
 }; // === === === --- -> eof setup
 
 
 // draw
 function draw() {
-    background(185, 146, 155);
+    background(255);
     translate(width/2, height/2);
     scale(zoom);
     translate(dragPos.x , dragPos.y);
@@ -236,7 +239,7 @@ function mousePressed() {
     initialMousePos = createVector(mouseX, mouseY);
     // bodySelected = false;
 
-    for (let i = 0; i < nodes.length; i++) {
+    for (let i = nodes.length -1; i >=0; i--) {
         if (nodes[i].isOver()) {
             nodes[i].select();
             // bodySelected = true;
@@ -362,3 +365,32 @@ function getUniqueSiglasPartido(data) {
     });
     return Array.from(uniqueSiglas); // Convert the Set back to an array
 }
+
+
+
+function makePartidosNodes(){
+    makeGrid();
+    const partidosAtivos = getUniqueSiglasPartido(deputados);
+    // for (const  p of partidosAtivos){
+    //     const n = Node.makeFromPartido(p);
+    //     n.type = 0;
+    //    nodes.push(n);
+    // }
+
+    for (var i = 0; i < partidosAtivos.length; i++) {
+        const p = partidosAtivos[i];
+       const n = Node.makeFromPartido(p, grid[i]);
+        n.type = 0;
+       nodes.push(n);
+    }
+}
+
+function makeGrid() {
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 3; j++) {``
+      grid.push(createVector(-2800 + i * 800, -1000+j * 900));
+    }
+  }
+}
+
+
