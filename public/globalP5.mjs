@@ -55,6 +55,7 @@ export default function runP5() {
     globalThis.mousePressed = mousePressed;
     globalThis.mouseReleased = mouseReleased;
     globalThis.mouseDragged = mouseDragged;
+    globalThis.keyPressed = keyPressed;
     globalThis.mocha = 'Hack to block p5.js auto global instantiation.';
     p5.instance || new p5; // Globally instantiate p5.js if it hasn't already.
     globalThis._setupDone = void 0; // Suppress duplicate imported warning.
@@ -83,6 +84,11 @@ let resizeTimeout;
 let scrollOff = 0.0;
 let totalHeight = 0.0;
 
+let forceSlider, minDistSlider, maxDistSlider;
+let forceValue, minDistValue, maxDistValue;
+let a = 0,
+    b = 0;
+
 
 //new stuff for nodes
 export let nodes = []
@@ -90,7 +96,7 @@ let nodesNumber = 520;
 
 
 
-let zoom = 0.1;
+export let zoom = 1;
 let dragPos;
 
 let isDraggingCanvas = false;
@@ -117,22 +123,75 @@ let initialMousePos;
 //  0 part  0        width
 //
 //  1 depu  0        10050
+//      0        0          0       1
+//  [partido][partido] | [partido][deputado]
+// 
+//      1        0          1       1
+//  [deputado][partido] | [deputado][deputado]
+// let initialForces = {
+//     '00': -3.2,
+//     '01': 6.6,
+//     '10': -0.5,
+//     '11': -1.1
+// }
+
+// let initialMin = {
+//     '00': 0,
+//     '01': 95,
+//     '10': 0,
+//     '11': 0
+// }
+
+// let initialMax = {
+//     '00': 250,
+//     '01': 3300,
+//     '10': 66,
+//     '11': 135
+// }
+
+let initialForces = {
+    '00': 0,
+    '01': 0,
+    '10': 0,
+    '11': 0
+}
+
+let initialMin = {
+    '00': 0,
+    '01': 0,
+    '10': 0,
+    '11': 0
+}
+
+let initialMax = {
+    '00': 0,
+    '01': 0,
+    '10': 0,
+    '11': 0
+}
 
 export let forces = [
-    [-7, 8],
-    [7, -12 ]
+    [initialForces['00'], initialForces['01']],
+    [initialForces['10'], initialForces['11']]
 ]
 
 export let minDist = [
-    [500, -1],
-    [300,0]
+    [initialMin["00"], initialMin["01"]],
+    [initialMin["10"], initialMin["11"]]
 ]
 export let maxDist = [
-    [2700, 0],
-    [19000, 800]
+    [initialMax['00'], initialMax['01']],
+    [initialMax['10'], initialMax['11']]
 ]
 
+// == === == == == == == == == == == == === == == == === =
 
+
+
+
+
+
+// == === == == == == == == == == == == === == == == === =
 
 function preload() {
     cnvHeight = calcCnvHeight();
@@ -162,70 +221,37 @@ function setup() {
 
     cnv.mouseWheel(handleWheel)
 
+    createTestSliders();
 
     imageMode(CENTER)
+    ellipseMode(CENTER)
     dragPos = createVector(0, 0);
     makePartidosNodes();
     console.log(partidosAtivos)
-
-
-    // for (var i = 0; i < nodesNumber; i++) {
-    //     // nodes.push(new Body(random(180,220), random(180,220), 30, c));
-    //     nodes.push(new Node(random(-800, 800), random(-800, 800), 60, 'PARTIDO1'));
-    //     if (random(1) > 0.7) {
-    //         nodes[i].partido = "PARTIDO2"
-    //     }
-    //     if (random(1) > 0.9) {
-    //         nodes[i].partido = "PARTIDO3"
-    //     }
-    //     if (random(1) > 0.8) {
-    //         nodes[i].partido = "PARTIDO4"
-    //     }
-    // }
-
-    // nodes[0].mass = 120;
-    // nodes[0].type = 0;
-    // nodes[0].partido = 'PARTIDO2';
-    // nodes[1].mass = 120;
-    // nodes[1].type = 0;
-    // nodes[1].partido = 'PARTIDO1';
-    // nodes[2].mass = 120;
-    // nodes[2].type = 0;
-    // nodes[2].partido = 'PARTIDO3';
-    // nodes[3].mass = 120;
-    // nodes[3].type = 0;
-    // nodes[3].partido = 'PARTIDO4';
-console.log(deputados);
+    console.log(deputados);
 }; // === === === --- -> eof setup
 
 
 // draw
 function draw() {
     background(255);
-    translate(width/2, height/2);
+    translate(width / 2, height / 2);
     scale(zoom);
-    translate(dragPos.x , dragPos.y);
+    translate(dragPos.x, dragPos.y);
 
-    
+    // Update forces with slider values
+    forces[a][b] = forceSlider.value();
+    minDist[a][b] = minDistSlider.value();
+    maxDist[a][b] = maxDistSlider.value();
+
     for (const b of nodes) {
         b.display();
         b.update();
     }
-    // clear(140);
-    // // orbitControl(); 
-    // textSize(40);
-    // for (var i = 0; i < deputados.length; i++) {
-    //     const dep = deputados[i];
-    //     const x = dep.badgeWidth * 0.7;
-    //     const y = scrollOff + (dep.badgeWidth * 1.6) * i;
-    //     dep.showImage(x, y);
-    //     text(dep.nome, x + 30 + dep.badgeWidth / 2, y - 160);
-    //     text(dep.siglaPartido, x + 30 + dep.badgeWidth / 2, y - 100);
-    //     text(dep.municipioNascimento + " - " + dep.siglaUf, x + 30 + dep.badgeWidth / 2, y - 40);
-    //     const t = dep.escolaridade ? dep.escolaridade : "sem dados";
-    //     text("escolaridade: " + t, x + 30 + dep.badgeWidth / 2, y + 20);
-    // }
-}; // === === === --- -> eof draw
+
+    // Call the function to update displayed values
+    updateDisplayedValues();
+} // === === === --- -> eof draw
 
 
 function windowResized() {
@@ -234,18 +260,32 @@ function windowResized() {
     redraw();
 };
 
+function keyPressed() {
+    if (key === 'a' || key === 'A') {
+        a = (a + 1) % 2; // Toggle between 0 and 1
+    } else if (key === 'b' || key === 'B') {
+        b = (b + 1) % 2; // Toggle between 0 and 1
+    }
+
+
+    // Update the sliders with the new values
+    updateSlidersWithCurrentValues();
+
+    // Update the displayed values to include `a` and `b`
+    updateDisplayedValues();
+}
 
 function mousePressed() {
     initialMousePos = createVector(mouseX, mouseY);
     // bodySelected = false;
 
-    for (let i = nodes.length -1; i >=0; i--) {
+    for (let i = nodes.length - 1; i >= 0; i--) {
         if (nodes[i].isOver()) {
             nodes[i].select();
             // bodySelected = true;
             isDraggingCanvas = false;
             return;
-        }else{isDraggingCanvas = true;}
+        } else { isDraggingCanvas = true; }
     }
 
     // if (!bodySelected) {
@@ -277,10 +317,43 @@ function mouseDragged() {
 function handleWheel() {
     const d = event.deltaY / 500;
     zoom += d
-    zoom = constrain(zoom, 0.1, 20);
-    maxDist[1][0] /= zoom * zoom * 0.2;
+    zoom = constrain(zoom, 0.2, 10);
+
+    balanceProperty(forces, 0, 1, 3.8, initialForces['01'], 3.5)
+    balanceProperty(minDist, 0, 1, 266, initialMin["01"], 88)
+    balanceProperty(maxDist, 0, 1, 15000, initialMax['01'], 1500)
+
+    balanceProperty(forces, 1, 1, -0.8, initialForces['11'], -3.5)
+    balanceProperty(maxDist, 1, 1, 140, initialMax['11'], 195)
+
+    balanceProperty(maxDist, 0, 0, 760, initialMax['00'], 700)
+
+
+    // balanceProperty(minDist, 0, 1, 1500 , 3100, 15000)
     return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //   EOF P5 default functions
 // === === == === === == === === ==
@@ -290,6 +363,15 @@ function handleWheel() {
 // other functions and objects using p5 
 //     vvvv ====== ==== vvvv ==== ====== vvvv
 
+function balanceProperty(array, a, b, min, one, max) {
+    let adjusted;
+    if (zoom <= 1) {
+        adjusted = map(zoom, 0.2, 1, min, one);
+    } else {
+        adjusted = map(zoom, 1.1, 10, one, max);
+    }
+    array[a][b] = adjusted;
+}
 
 function calcCnvHeight() {
     // Get header element
@@ -368,7 +450,7 @@ function getUniqueSiglasPartido(data) {
 
 
 
-function makePartidosNodes(){
+function makePartidosNodes() {
     makeGrid();
     const partidosAtivos = getUniqueSiglasPartido(deputados);
     // for (const  p of partidosAtivos){
@@ -376,21 +458,63 @@ function makePartidosNodes(){
     //     n.type = 0;
     //    nodes.push(n);
     // }
+    const partidosRandom = _.shuffle(partidosAtivos);
 
-    for (var i = 0; i < partidosAtivos.length; i++) {
-        const p = partidosAtivos[i];
-       const n = Node.makeFromPartido(p, grid[i]);
+    for (var i = 0; i < partidosRandom.length; i++) {
+        const p = partidosRandom[i];
+        const n = Node.makeFromPartido(p, grid[i]);
+        // const n = Node.makeFromPartido(p, createVector(10, 10));
         n.type = 0;
-       nodes.push(n);
+        nodes.push(n);
     }
 }
 
 function makeGrid() {
-  for (let i = 0; i < 8; i++) {
-    for (let j = 0; j < 3; j++) {``
-      grid.push(createVector(-2800 + i * 800, -1000+j * 900));
+    for (let i = 0; i < 720; i += 24) {
+
+        grid.push(createVector(cos(radians(-140 + i)) * 600, sin(radians(-140 + i)) * 600));
+
     }
-  }
+}
+
+// Create the sliders and text elements
+function createTestSliders() {
+    forceSlider = createSlider(-20, 20, forces[a][b], 0.1);
+    forceSlider.position(10, height - 110);
+    forceSlider.style('width', '400px');
+
+    minDistSlider = createSlider(0, 1000, minDist[a][b], 0.5);
+    minDistSlider.position(10, height - 60);
+    minDistSlider.style('width', '400px');
+
+    maxDistSlider = createSlider(0, 9000, maxDist[a][b], 0.5);
+    maxDistSlider.position(10, height - 10);
+    maxDistSlider.style('width', '1800px');
+
+    forceValue = createP();
+    forceValue.position(220, height - 110);
+
+    minDistValue = createP();
+    minDistValue.position(220, height - 60);
+
+    maxDistValue = createP();
+    maxDistValue.position(220, height - 10);
+
+    // Initialize the displayed values
+    updateDisplayedValues();
 }
 
 
+// Update the sliders with the current values of forces, minDist, and maxDist
+function updateSlidersWithCurrentValues() {
+    forceSlider.value(forces[a][b]);
+    minDistSlider.value(minDist[a][b]);
+    maxDistSlider.value(maxDist[a][b]);
+}
+
+// Update the displayed values
+function updateDisplayedValues() {
+    forceValue.html(`Force (a=${a}, b=${b}): ${forceSlider.value()} -- -- ZOOM= ${zoom}`);
+    minDistValue.html(`Min Distance (a=${a}, b=${b}): ${minDistSlider.value()}`);
+    maxDistValue.html(`Max Distance (a=${a}, b=${b}): ${maxDistSlider.value()}`);
+}

@@ -1,13 +1,14 @@
-import { nodes } from '../globalP5.mjs'
+import { nodes, zoom } from '../globalP5.mjs'
 import { screenToWorld, minDist, maxDist, forces } from '../globalP5.mjs'
 
-const K = 1.2;
+const K = 2.0;
 const friction = 0.8;
 
 export default class Node {
     constructor(x, y, m, partido) {
         this.pos = createVector(x, y, 1);
         this.mass = m;
+        this.diam = this.mass;
         this.vel = createVector(0, 0);
         this.isSelected = false;
 
@@ -31,13 +32,13 @@ export default class Node {
     }
 
     static makeFromCsDeputado(dep) {
-        const n = new Node(random(-900, 900), random(-900, 900), 200, dep.siglaPartido);
+        const n = new Node(random(-1300, 1300), random(-900, 900), 20, dep.siglaPartido);
         n.deputado = dep;
         return n;
     }
 
     static makeFromPartido(sigla, pos) {
-        const n = new Node(pos.x, pos.y, 550, sigla);
+        const n = new Node(pos.x, pos.y, 80, sigla);
         // n.deputado = dep;
         return n;
     }
@@ -52,7 +53,7 @@ export default class Node {
     isOver() {
         let worldMouse = screenToWorld(mouseX, mouseY);
         const distance = dist(worldMouse.x, worldMouse.y, this.pos.x, this.pos.y);
-        return distance < (this.mass / 2);
+        return distance < (this.diam / 2);
     }
 
 
@@ -70,8 +71,8 @@ export default class Node {
 
             if (body !== this) {
                 if (this.partido === body.partido || this.type === 0) {
-                    this.maxDist = maxDist[this.type][body.type];
-                    this.minDist = minDist[this.type][body.type]
+                    this.maxDist = maxDist[body.type][this.type];
+                    this.minDist = minDist[body.type][this.type]
                     // console.log(body)
                     //clear for this particle
                     dir.mult(0);
@@ -90,17 +91,19 @@ export default class Node {
 
 
                     //repel based on dist
-                    if (dist < minDist[this.type][body.type]) {
+                    if (dist < minDist[body.type][this.type]) {
                         this.dispColor = this.color2
                         // don't mess with dir
                         const force = dir.copy();
 
                         // an arbitrary value - in the example we had a table with a unique
                         // value for each combination. Let's see what i'll need...
-                        force.mult(forces[this.type][body.type] * -3); // negative => repel
+                        force.mult(forces[body.type][this.type] * -2); // negative => repel
 
                         //map dist to positive 0~1 and multiply
-                        const mappedD = abs(map(dist, 0, this.minDist, 1, 0)); // <== note 1 e 0  not 0 e 1
+                        const mappedD = abs(map(dist, 0, minDist[body.type][this.type], 1, 0)); // <== note 1 e 0  not 0 e 1
+                        //era assim, funcionava, mas eu achei que deveriua ser como acima, mas guardei o q funcionava
+                        // const mappedD = abs(map(dist, 0, this.minDist, 1, 0)); // <== note 1 e 0  not 0 e 1
                         force.mult(mappedD);
 
                         // a constant to scale down the forces 0.5 in the example
@@ -109,17 +112,17 @@ export default class Node {
                         //accumulate all the forces of all other particles interacting with this one
                         totalForce.add(force);
                     }
-                    if (dist < maxDist[this.type][body.type]) {
+                    if (dist < maxDist[body.type][this.type]) {
                         this.dispColor = this.color3;
                         // don't mess with dir
                         const force = dir.copy();
 
                         // an arbitrary value - in the example we had a table with a unique
                         // value for each combination. Let's see what i'll need...
-                        force.mult(forces[this.type][body.type]);
+                        force.mult(forces[body.type][this.type]);
 
                         //map dist to positive 0~1 and multiply
-                        const mappedD = abs(map(dist, 0, maxDist[this.type][body.type], 1, 0)); // <== note 1 e 0  not 0 e 1
+                        const mappedD = abs(map(dist, 0, maxDist[body.type][this.type], 1, 0)); // <== note 1 e 0  not 0 e 1
                         force.mult(mappedD);
 
                         // a constant to scale down the forces 0.5 in the example
@@ -143,45 +146,57 @@ export default class Node {
             this.pos.x = worldMouse.x;
             this.pos.y = worldMouse.y;
         }
-    }
-
-
-    display() {
-        push();
-        // noStroke()
-        // fill(255, 30);
-        // circle(this.pos.x, this.pos.y, this.maxDist)
-        // stroke(255, 0, 0, 50);
-        // fill(255, 250, 250, 20);
-        // circle(this.pos.x, this.pos.y, this.minDist)
-
-        if (this.deputado) {
-            fill(60, 60, 60);
-            circle(this.pos.x - 2, this.pos.y - 20, this.mass * 1.8);
-
-            image(this.deputado.image, this.pos.x, this.pos.y, this.mass, this.mass * 1.33);
-        } else {
-            fill(190);
-            circle(this.pos.x, this.pos.y, this.mass);
-        }
-
         if (this.type === 0) {
-            fill(0)
-            textSize(170)
-            text(this.partido, this.pos.x - 40, this.pos.y);
+            let offset = 0;
+            if (zoom <= 0.3) {
+                offset = map(zoom, 0.2, 0.3, this.mass*3.5, this.mass * 3);
+            } else if (zoom <= 1) {
+                offset = map(zoom, 0.3, 1, this.mass * 3, this.mass);
+            } else  {
+                offset = map(zoom, 1, 10, this.mass, this.mass*0.8);
+            }
+
+            console.log(offset);
+            this.diam = offset;
         }
-
-        // if (this.type === 1) {
-        //     image(img, this.pos.x, this.pos.y);
-        //     textSize(7)
-        //     text('Nome Filhadaputa', this.pos.x -25, this.pos.y +30);
-        // } else {
-        //     fill(this.dispColor);
-        //     noStroke()
-        //     circle(this.pos.x, this.pos.y, this.mass);
-        // }
-
-        if (this.isOver()) { rect(this.pos.x, this.pos.y, 20, 20) }
-        pop();
     }
+
+display() {
+    push();
+    noStroke()
+    // fill(255, 30);
+    // circle(this.pos.x, this.pos.y, this.maxDist)
+    // stroke(255, 0, 0, 50);
+    // fill(255, 250, 250, 20);
+    // circle(this.pos.x, this.pos.y, this.minDist)
+
+    if (this.deputado) {
+        fill(60, 60, 60);
+        circle(this.pos.x, this.pos.y, this.mass * 1.8);
+
+        image(this.deputado.image, this.pos.x, this.pos.y + 3, this.mass, this.mass * 1.33);
+    } else {
+        fill(190);
+        circle(this.pos.x, this.pos.y, this.diam);
+    }
+
+    if (this.type === 0) {
+        fill(0)
+        textSize(30)
+        text(this.partido, this.pos.x - (textWidth(this.partido) / 2), this.pos.y + 6);
+    }
+
+    // if (this.type === 1) {
+    //     image(img, this.pos.x, this.pos.y);
+    //     textSize(7)
+    //     text('Nome Filhadaputa', this.pos.x -25, this.pos.y +30);
+    // } else {
+    //     fill(this.dispColor);
+    //     noStroke()
+    //     circle(this.pos.x, this.pos.y, this.mass);
+    // }
+
+    if (this.isOver()) { rect(this.pos.x, this.pos.y, 20, 20) }
+    pop();
+}
 } //<=== EOF NODE

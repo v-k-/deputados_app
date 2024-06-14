@@ -163,7 +163,7 @@
 
 
         //error and tests 
-        let testMode = true; // Test mode flag
+        let testMode = false; // Test mode flag
         let throwFetchError = false;
 
         // a var to keep track of retriver time 
