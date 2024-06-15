@@ -151,23 +151,23 @@ let initialMousePos;
 
 let initialForces = {
     '00': 0,
-    '01': 0,
+    '01': 1.9,
     '10': 0,
-    '11': 0
+    '11': 0.5
 }
 
 let initialMin = {
     '00': 0,
-    '01': 0,
+    '01': 250,
     '10': 0,
-    '11': 0
+    '11': 99
 }
 
 let initialMax = {
     '00': 0,
-    '01': 0,
+    '01': 3500,
     '10': 0,
-    '11': 0
+    '11': 90
 }
 
 export let forces = [
@@ -319,14 +319,14 @@ function handleWheel() {
     zoom += d
     zoom = constrain(zoom, 0.2, 10);
 
-    balanceProperty(forces, 0, 1, 3.8, initialForces['01'], 3.5)
-    balanceProperty(minDist, 0, 1, 266, initialMin["01"], 88)
-    balanceProperty(maxDist, 0, 1, 15000, initialMax['01'], 1500)
+    // balanceProperty(forces, 0, 1, 3.8, initialForces['01'], 3.5)
+    // balanceProperty(minDist, 0, 1, 266, initialMin["01"], 88)
+    // balanceProperty(maxDist, 0, 1, 15000, initialMax['01'], 1500)
 
-    balanceProperty(forces, 1, 1, -0.8, initialForces['11'], -3.5)
-    balanceProperty(maxDist, 1, 1, 140, initialMax['11'], 195)
+    // balanceProperty(forces, 1, 1, -0.8, initialForces['11'], -3.5)
+    // balanceProperty(maxDist, 1, 1, 140, initialMax['11'], 195)
 
-    balanceProperty(maxDist, 0, 0, 760, initialMax['00'], 700)
+    // balanceProperty(maxDist, 0, 0, 760, initialMax['00'], 700)
 
 
     // balanceProperty(minDist, 0, 1, 1500 , 3100, 15000)
@@ -453,6 +453,8 @@ function getUniqueSiglasPartido(data) {
 function makePartidosNodes() {
     makeGrid();
     const partidosAtivos = getUniqueSiglasPartido(deputados);
+    console.log("SSS", partidosAtivos);
+
     // for (const  p of partidosAtivos){
     //     const n = Node.makeFromPartido(p);
     //     n.type = 0;
@@ -470,9 +472,9 @@ function makePartidosNodes() {
 }
 
 function makeGrid() {
-    for (let i = 0; i < 720; i += 24) {
+    for (let i = 0; i < 360; i += Math.floor(360/21))     {
 
-        grid.push(createVector(cos(radians(-140 + i)) * 600, sin(radians(-140 + i)) * 600));
+        grid.push(createVector(cos(radians(-140 + i)) * 800, sin(radians(-140 + i)) *380));
 
     }
 }
