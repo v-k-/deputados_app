@@ -1,7 +1,7 @@
 import runP5 from './globalP5.mjs';
 
 
-export let partidos  = [];
+export let partidos  = {};
 export let formattedDateTime= '';
 export let initialDepData = []
 
@@ -14,7 +14,9 @@ function getInitialData() {
             // Handle success
             console.log('Data received from server:');
             initialDepData = response.data.deputados
-            partidos = response.data.deputados
+            // partidos = response.data.deputados
+            partidos = response.data.partidos;
+            
 
             console.log("Hereby", initialDepData);
             const lastUpdateDate = new Date(response.data.lastUpdateDate);

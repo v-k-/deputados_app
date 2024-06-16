@@ -466,7 +466,7 @@ function makePartidosNodes() {
         const p = partidosRandom[i];
         const n = Node.makeFromPartido(p, grid[i]);
         // const n = Node.makeFromPartido(p, createVector(10, 10));
-        n.type = 0;
+        
         nodes.push(n);
     }
 }

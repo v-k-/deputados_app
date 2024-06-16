@@ -118,11 +118,21 @@
 
 
 
+        // async function makePartidos() {
+        //     const rawData = await fetchPartidos();
+        //     for (const partido of rawData) {
+        //         partidos.push(await Partido.create(partido));
+        //     }
+        // }
+
         async function makePartidos() {
             const rawData = await fetchPartidos();
+            const partidosObject = {};
             for (const partido of rawData) {
-                partidos.push(await Partido.create(partido));
+                const partidoInstance = await Partido.create(partido);
+                partidosObject[partidoInstance.sigla] = partidoInstance;
             }
+            partidos = partidosObject;
         }
 
         async function fetchPartidos() {
@@ -136,7 +146,7 @@
                 return rawPartidos;
             } catch (error) {
                 console.error('Error fetching Partidos:', error);
-                return []; // Ensure an empty array is returned in case of error
+                return {}; // Ensure an empty array is returned in case of error
             }
         }
 
@@ -162,9 +172,41 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+        // // /// // / // // // / /// / // ----- ----- ----- ----- ----- -----
+        // // /// // / // // // / /// / // ----- ----- ----- ----- ----- -----
+
+
         //error and tests 
-        let testMode = false; // Test mode flag
+        let testMode = true; // Test mode flag
         let throwFetchError = false;
+
+
+
+        // // /// // / // // // / /// / // ----- ----- ----- ----- ----- -----
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // a var to keep track of retriver time 
         let imageRetrieverTimer;
@@ -291,7 +333,7 @@
 
                 if (thereIsData && thereIsDate && thereIsPartidos) {
                     servingData = await arrayIO.stRead(fileName);
-                    partidos = await arrayIO.stRead('partidosLastData.json');
+                    partidos = await objRead('partidosLastData.json');
                     const lastUpdateDateData = await fs.promises.readFile('lastUpdateDate.json');
                     const { timestamp } = JSON.parse(lastUpdateDateData);
                     lastUpdateDate = new Date(timestamp); // Convert back to Date object
@@ -576,7 +618,7 @@
         async function saveData() {
             // Save new data to file both the array and the date
             await arrayIO.stWrite(servingData, fileName); // Write updated data to file
-            await arrayIO.stWrite(partidos, 'partidosLastData.json'); // Write updated data to file
+            await objWrite(partidos, 'partidosLastData.json'); // Write updated data to file
             lastUpdateDate = new Date(); // Update last retrieved time
             const timestamp = lastUpdateDate.getTime(); // Convert to Unix timestamp
             await fs.promises.writeFile('lastUpdateDate.json', JSON.stringify({
@@ -598,6 +640,49 @@
 
             return `${year}-${month}-${day}`;
         }
+
+
+
+        async function objWrite(data, filename) {
+            const writeStream = fs.createWriteStream(filename);
+
+            writeStream.write(JSON.stringify(data, null, 2));
+
+            writeStream.on('finish', () => {
+                console.log(`\nData as OBJ successfully written to file: ${filename}\n\n`);
+            });
+
+            writeStream.on('error', (err) => {
+                console.error('Error objWriting to file:', err);
+            });
+
+            writeStream.end();
+        }
+
+        async function objRead(filename) {
+            const readStream = fs.createReadStream(filename, {
+                encoding: 'utf8'
+            });
+            let input = '';
+
+            readStream.on('data', (chunk) => {
+                input += chunk;
+            });
+
+            return new Promise((resolve, reject) => {
+                readStream.on('end', () => {
+                    const data = JSON.parse(input);
+                    console.log(`Data has been read from OBJ ${filename}`);
+                    resolve(data);
+                });
+
+                readStream.on('error', (err) => {
+                    console.error('Error objReading file:', err);
+                    reject(err);
+                });
+            });
+        }
+
 
 
         async function main() {

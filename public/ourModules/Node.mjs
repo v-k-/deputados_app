@@ -1,5 +1,6 @@
 import { nodes, zoom } from '../globalP5.mjs'
 import { screenToWorld, minDist, maxDist, forces } from '../globalP5.mjs'
+import { partidos} from '../entry.mjs'
 
 const K = 2.0;
 const friction = 0.8;
@@ -39,7 +40,9 @@ export default class Node {
 
     static makeFromPartido(sigla, pos) {
         const n = new Node(pos.x, pos.y, 80, sigla);
+        n.type = 0;
         // n.deputado = dep;
+        console.log(n)
         return n;
     }
 
@@ -117,9 +120,18 @@ export default class Node {
                         // don't mess with dir
                         const force = dir.copy();
 
-                        // an arbitrary value - in the example we had a table with a unique
-                        // value for each combination. Let's see what i'll need...
+                        const partyForce = partidos[this.partido]?.status?.totalMembros;
+                        //get from 2d array each force related to other
+                        // console.log(forces[body.type][this.type]+partyForce)
+                       
+                            
+                        if(this.type===0){
+                        force.mult(forces[body.type][this.type]-partyForce);
+                            console.log(this.partido, this.type, "<===");
+                        }else{
+
                         force.mult(forces[body.type][this.type]);
+                        }
 
                         //map dist to positive 0~1 and multiply
                         const mappedD = abs(map(dist, 0, maxDist[body.type][this.type], 1, 0)); // <== note 1 e 0  not 0 e 1
@@ -156,7 +168,7 @@ export default class Node {
                 offset = map(zoom, 1, 10, this.mass, this.mass*0.8);
             }
 
-            console.log(offset);
+
             this.diam = offset;
         }
     }
