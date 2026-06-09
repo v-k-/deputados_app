@@ -195,7 +195,7 @@ export let maxDist = [
 
 function preload() {
     cnvHeight = calcCnvHeight();
-    // console.log('cnvHeight:', cnvHeight);
+    console.log('cnvHeight:', cnvHeight);
     if (initialDepData.length > 0) {
         initialDepData.map(dep => {
             deputados.push(new CsDeputado(dep));
@@ -227,8 +227,8 @@ function setup() {
     ellipseMode(CENTER)
     dragPos = createVector(0, 0);
     makePartidosNodes();
-    console.log(partidosAtivos)
-    console.log(deputados);
+    // console.log(partidosAtivos)
+    // console.log(deputados);
 }; // === === === --- -> eof setup
 
 
@@ -388,13 +388,13 @@ function calcCnvHeight() {
     const headerHeight = float(headerStyles.height);
     const topnavHeight = float(topnavStyles.height);
     const footerHeight = float(footerStyles.height);
-    // console.log('windowHeight:', windowHeight);
-    // console.log('Header height:', headerHeight);
-    // console.log('topnav height:', topnavHeight);
-    // console.log('Footer height:', footerHeight);
-    // console.log(self.innerHeight);
+    console.log('windowHeight:', windowHeight);
+    console.log('Header height:', headerHeight);
+    console.log('topnav height:', topnavHeight);
+    console.log('Footer height:', footerHeight);
+    console.log(self.innerHeight);
     // will log the height of the frame viewport within the frameset
-    // console.log(parent.innerHeight);
+    console.log(parent.innerHeight);
     // remaining space filled with a canvas. Parentheses for clarity.
     return windowHeight - headerHeight - topnavHeight - footerHeight;
 }
@@ -412,10 +412,10 @@ function displaySorted(field) {
         return valueA.localeCompare(valueB, 'pt', { sensitivity: 'base' });
     });
 
-    console.log(`sorted by ${field}`);
+    // console.log(`sorted by ${field}`);
     for (let i = 0; i < sortedDeputados.length; i++) {
         const dep = sortedDeputados[i];
-        // console.log(dep[field]);
+        console.log(dep[field]);
         const badgeWidth = debadgeWidth * 0.14;
         const padding = 0; // Padding between badges
         const badgesPerRow = Math.floor(window.innerWidth / (badgeWidth + padding)); // Calculate how many badges can fit in a row
@@ -453,7 +453,7 @@ function getUniqueSiglasPartido(data) {
 function makePartidosNodes() {
     makeGrid();
     const partidosAtivos = getUniqueSiglasPartido(deputados);
-    console.log("SSS", partidosAtivos);
+    // console.log("SSS", partidosAtivos);
 
     // for (const  p of partidosAtivos){
     //     const n = Node.makeFromPartido(p);

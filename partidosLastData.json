@@ -22,11 +22,11 @@
       ]
     },
     "status": {
-      "data": "2024-06-11T14:34",
+      "data": "2026-04-15T21:26",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "7",
-      "totalMembros": "7",
+      "totalMembros": "5",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=AVANTE",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/91228",
@@ -70,7 +70,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "5",
-      "totalMembros": "5",
+      "totalMembros": "2",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=CIDADANIA",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/178972",
@@ -110,11 +110,11 @@
       ]
     },
     "status": {
-      "data": "2024-05-27T09:29",
+      "data": "2026-05-14T09:14",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "42",
-      "totalMembros": "44",
+      "totalPosse": "41",
+      "totalMembros": "38",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=MDB",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204436",
@@ -128,6 +128,50 @@
     },
     "numeroEleitoral": null,
     "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/MDB.gif",
+    "urlWebSite": null,
+    "urlFacebook": null
+  },
+  "MISSÃO": {
+    "id": 38011,
+    "sigla": "MISSÃO",
+    "nome": "Partido Missão",
+    "url": "https://dadosabertos.camara.leg.br/api/v2/partidos/38011",
+    "colors": {
+      "a": [
+        120,
+        120,
+        120
+      ],
+      "b": [
+        60,
+        60,
+        60
+      ],
+      "c": [
+        300,
+        300,
+        300
+      ]
+    },
+    "status": {
+      "data": "2026-03-10T12:14",
+      "idLegislatura": "57",
+      "situacao": "Ativo",
+      "totalPosse": "0",
+      "totalMembros": "1",
+      "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=MISSÃO",
+      "lider": {
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204536",
+        "nome": "Kim Kataguiri",
+        "siglaPartido": "MISSÃO",
+        "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/38011",
+        "uf": "SP",
+        "idLegislatura": 57,
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204536.jpg"
+      }
+    },
+    "numeroEleitoral": null,
+    "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/MISSÃO.gif",
     "urlWebSite": null,
     "urlFacebook": null
   },
@@ -154,20 +198,20 @@
       ]
     },
     "status": {
-      "data": "2023-02-01T14:52",
+      "data": "2026-05-19T17:03",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "3",
-      "totalMembros": "3",
+      "totalMembros": "5",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=NOVO",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204528",
-        "nome": "Adriana Ventura",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204365",
+        "nome": "Gilson Marques",
         "siglaPartido": "NOVO",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37901",
-        "uf": "SP",
+        "uf": "SC",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204528.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204365.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -242,20 +286,20 @@
       ]
     },
     "status": {
-      "data": "2021-02-09T17:31",
+      "data": "2023-12-22T18:10",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "6",
-      "totalMembros": "7",
+      "totalPosse": "7",
+      "totalMembros": "11",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PCdoB",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73801",
-        "nome": "Renildo Calheiros",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204394",
+        "nome": "Gervásio Maia",
         "siglaPartido": "PCdoB",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36779",
-        "uf": "PE",
+        "uf": "PB",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/73801.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204394.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -286,20 +330,20 @@
       ]
     },
     "status": {
-      "data": "2024-04-16T20:52",
+      "data": "2025-02-04T12:10",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "17",
-      "totalMembros": "18",
+      "totalPosse": "16",
+      "totalMembros": "9",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PDT",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/133439",
-        "nome": "André Figueiredo",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/74158",
+        "nome": "Mário Heringer",
         "siglaPartido": "PDT",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36786",
-        "uf": "CE",
+        "uf": "MG",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/133439.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/74158.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -330,20 +374,20 @@
       ]
     },
     "status": {
-      "data": "2024-04-01T18:04",
+      "data": "2026-03-31T12:27",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "99",
-      "totalMembros": "96",
+      "totalPosse": "97",
+      "totalMembros": "97",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PL",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204411",
-        "nome": "Filipe Barros",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204374",
+        "nome": "Bia Kicis",
         "siglaPartido": "PL",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
-        "uf": "PR",
+        "uf": "DF",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204411.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204374.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -374,20 +418,20 @@
       ]
     },
     "status": {
-      "data": "2024-04-26T10:48",
+      "data": "2026-03-23T15:10",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "18",
-      "totalMembros": "15",
+      "totalPosse": "20",
+      "totalMembros": "27",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PODE",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160629",
-        "nome": "Romero Rodrigues",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220641",
+        "nome": "Rodrigo Gambale",
         "siglaPartido": "PODE",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36896",
-        "uf": "PB",
+        "uf": "SP",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160629.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220641.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -418,20 +462,20 @@
       ]
     },
     "status": {
-      "data": "2024-04-19T14:30",
+      "data": "2025-11-24T10:06",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "47",
-      "totalMembros": "49",
+      "totalMembros": "47",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PP",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160527",
-        "nome": "Aguinaldo Ribeiro",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204450",
+        "nome": "Doutor Luizinho",
         "siglaPartido": "PP",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37903",
-        "uf": "PB",
+        "uf": "RJ",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160527.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204450.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -466,7 +510,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "5",
-      "totalMembros": "5",
+      "totalMembros": "2",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PRD",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204494",
@@ -550,20 +594,20 @@
       ]
     },
     "status": {
-      "data": "2023-12-22T18:10",
+      "data": "2026-01-02T14:23",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "14",
-      "totalMembros": "14",
+      "totalPosse": "15",
+      "totalMembros": "17",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PSB",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204394",
-        "nome": "Gervásio Maia",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160548",
+        "nome": "Jonas Donizette",
         "siglaPartido": "PSB",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36832",
-        "uf": "PB",
+        "uf": "SP",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204394.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160548.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -638,11 +682,11 @@
       ]
     },
     "status": {
-      "data": "2023-09-12T09:57",
+      "data": "2025-12-22T09:19",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "42",
-      "totalMembros": "43",
+      "totalMembros": "48",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PSD",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160553",
@@ -682,11 +726,11 @@
       ]
     },
     "status": {
-      "data": "2023-02-01T14:42",
+      "data": "2026-04-22T08:53",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "13",
-      "totalMembros": "12",
+      "totalMembros": "18",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PSDB",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204560",
@@ -726,20 +770,20 @@
       ]
     },
     "status": {
-      "data": "2024-02-21T19:11",
+      "data": "2026-02-05T18:21",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "12",
-      "totalMembros": "13",
+      "totalPosse": "13",
+      "totalMembros": "12",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PSOL",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220645",
-        "nome": "Erika Hilton",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220598",
+        "nome": "Tarcísio Motta",
         "siglaPartido": "PSOL",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36839",
-        "uf": "SP",
+        "uf": "RJ",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220645.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220598.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -770,20 +814,20 @@
       ]
     },
     "status": {
-      "data": "2024-02-07T17:50",
+      "data": "2026-04-15T08:37",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "69",
-      "totalMembros": "68",
+      "totalMembros": "65",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PT",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/74159",
-        "nome": "Odair Cunha",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/74400",
+        "nome": "Paulo Pimenta",
         "siglaPartido": "PT",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36844",
-        "uf": "MG",
+        "uf": "RS",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/74159.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/74400.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -862,7 +906,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "6",
-      "totalMembros": "5",
+      "totalMembros": "6",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PV",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73586",
@@ -906,7 +950,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "2",
-      "totalMembros": "1",
+      "totalMembros": "4",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=REDE",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/157130",
@@ -946,20 +990,20 @@
       ]
     },
     "status": {
-      "data": "2023-11-20T09:48",
+      "data": "2026-02-25T09:42",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "40",
-      "totalMembros": "43",
+      "totalMembros": "42",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=REPUBLICANOS",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160674",
-        "nome": "Hugo Motta",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160665",
+        "nome": "Augusto Coutinho",
         "siglaPartido": "REPUBLICANOS",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908",
-        "uf": "PB",
+        "uf": "PE",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160674.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160665.jpg"
       }
     },
     "numeroEleitoral": null,
@@ -994,7 +1038,7 @@
       "idLegislatura": "57",
       "situacao": null,
       "totalPosse": "0",
-      "totalMembros": "1",
+      "totalMembros": "0",
       "uriMembros": "",
       "lider": {
         "uri": "",
@@ -1034,7 +1078,7 @@
       ]
     },
     "status": {
-      "data": "2024-04-10T09:03",
+      "data": "2025-10-21T20:48",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "7",
@@ -1078,20 +1122,20 @@
       ]
     },
     "status": {
-      "data": "2023-02-01T14:48",
+      "data": "2025-10-30T14:39",
       "idLegislatura": "57",
       "situacao": "Ativo",
-      "totalPosse": "59",
-      "totalMembros": "58",
+      "totalPosse": "58",
+      "totalMembros": "51",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=UNIÃO",
       "lider": {
-        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/178854",
-        "nome": "Elmar Nascimento",
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/122974",
+        "nome": "Pedro Lucas Fernandes",
         "siglaPartido": "UNIÃO",
         "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/38009",
-        "uf": "BA",
+        "uf": "MA",
         "idLegislatura": 57,
-        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/178854.jpg"
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/122974.jpg"
       }
     },
     "numeroEleitoral": null,
