@@ -138,4 +138,4 @@ servidor_app.sublime-workspace
 /public/database/images/*
 
 # Gigantic database updates
-/latestData.json
+latestData.json
