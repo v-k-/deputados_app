@@ -466,7 +466,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "47",
-      "totalMembros": "47",
+      "totalMembros": "46",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PP",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204450",
@@ -510,7 +510,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "5",
-      "totalMembros": "2",
+      "totalMembros": "3",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PRD",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204494",
@@ -774,7 +774,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "13",
-      "totalMembros": "12",
+      "totalMembros": "13",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PSOL",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220598",
@@ -950,7 +950,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "2",
-      "totalMembros": "4",
+      "totalMembros": "3",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=REDE",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/157130",
@@ -994,7 +994,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "40",
-      "totalMembros": "42",
+      "totalMembros": "43",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=REPUBLICANOS",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160665",
@@ -1082,7 +1082,7 @@
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "7",
-      "totalMembros": "5",
+      "totalMembros": "4",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=SOLIDARIEDADE",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160512",
@@ -1122,11 +1122,11 @@
       ]
     },
     "status": {
-      "data": "2025-10-30T14:39",
+      "data": "2026-06-09T08:29",
       "idLegislatura": "57",
       "situacao": "Ativo",
       "totalPosse": "58",
-      "totalMembros": "51",
+      "totalMembros": "52",
       "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=UNIÃO",
       "lider": {
         "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/122974",
